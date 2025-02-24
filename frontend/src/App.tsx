@@ -4,8 +4,8 @@ function App() {
 
   return (
     <Container maxWidth="sm">
-      <Typography variant="h4" align="center" gutterBottom color="primary">Hello, Free mentors</Typography>
-      <Button variant="contained" color="primary">Click Me</Button>
+      <Typography variant="h4" gutterBottom>Hello, Free mentors</Typography>
+      <Button variant="outlined" centerRipple color="primary">Click Me</Button>
     </Container>
   )
 }
