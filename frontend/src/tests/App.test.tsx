@@ -3,18 +3,18 @@ import { render, screen } from '@testing-library/react';
 import App from '../App';
 
 describe('App Component', () => {
-    it('should render without errors', () => {
+    it('should render a button with text "Click Me"', () => {
         render(<App />);
-        expect(screen.getByRole('heading')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
     });
 
-    it('should render a heading with text "My App"', () => {
+    it('should render text "Hello, Free mentors"', () => {
         render(<App />);
-        expect(screen.getByRole('heading', { name: /my app/i })).toBeInTheDocument();
+        expect(screen.getByText(/hello, free mentors/i)).toBeInTheDocument();
     });
 
-    it('should render a paragraph with text "It\'s working!"', () => {
-        render(<App />);
-        expect(screen.getByText("It's working!")).toBeInTheDocument();
+    it('should render inside a container', () => {
+        const { container } = render(<App />);
+        expect(container.querySelector('.MuiContainer-root')).toBeInTheDocument();
     });
 });

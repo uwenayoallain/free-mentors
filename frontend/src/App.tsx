@@ -1,12 +1,12 @@
 import React from 'react'
-
-const App = () => {
+import { Container, Typography, Button } from "@mui/material"
+function App() {
 
   return (
-    <div>
-      <h1>My App</h1>
-      <p>It's working!</p>
-    </div>
+    <Container maxWidth="sm">
+      <Typography variant="h4" align="center" gutterBottom color="primary">Hello, Free mentors</Typography>
+      <Button variant="contained" color="primary">Click Me</Button>
+    </Container>
   )
 }
 
