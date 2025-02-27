@@ -65,7 +65,7 @@ export const updateSessionStatus = createAsyncThunk<
     }
 
     return response.data!;
-  }
+  },
 );
 
 export const createReview = createAsyncThunk<
@@ -133,7 +133,7 @@ const sessionsSlice = createSlice({
     builder.addCase(updateSessionStatus.fulfilled, (state, action) => {
       state.isLoading = false;
       const index = state.sessions.findIndex(
-        (session) => session.id === action.payload.id
+        (session) => session.id === action.payload.id,
       );
       if (index !== -1) {
         state.sessions[index] = action.payload;

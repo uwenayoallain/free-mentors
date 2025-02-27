@@ -74,7 +74,7 @@ export const changeMentorStatus = createAsyncThunk<
     }
 
     dispatch(fetchMentors());
-  }
+  },
 );
 
 export const hideReview = createAsyncThunk<
@@ -149,7 +149,7 @@ const mentorsSlice = createSlice({
     // Hide Review
     builder.addCase(hideReview.fulfilled, (state, action) => {
       state.reviews = state.reviews.filter(
-        (review) => review.id !== action.payload.id
+        (review) => review.id !== action.payload.id,
       );
     });
   },

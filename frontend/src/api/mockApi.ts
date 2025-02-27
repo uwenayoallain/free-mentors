@@ -58,7 +58,7 @@ const mentors: Mentor[] = [
   },
   {
     id: "4",
-    email: "michael.brown@example.com",
+    email: "michael@freementors.com",
     firstName: "Michael",
     lastName: "Brown",
     role: UserRole.MENTOR,
@@ -131,7 +131,7 @@ const sessions: Session[] = [
     title: "Career Transition to Web Development",
     description:
       "I need guidance on transitioning from backend to frontend development",
-    status: SessionStatus.ACCEPTED,
+    status: SessionStatus.COMPLETED,
     scheduledDate: new Date(
       new Date().getTime() + 7 * 24 * 60 * 60 * 1000
     ).toISOString(),
@@ -222,7 +222,9 @@ export const mockApi = {
     await delay(500);
 
     // In a mock environment, we'll accept any registered email with any password
-    const user = users.find((user) => user.email === input.email);
+    const user =
+      users.find((user) => user.email === input.email) ||
+      mentors.find((mentor) => mentor.email === input.email);
     if (!user) {
       return {
         error: {
@@ -284,6 +286,15 @@ export const mockApi = {
     }
 
     return { data: mockStorage.user };
+  },
+
+  getAllUsers: (): User[] => {
+    return [
+      ...users,
+      ...mentors.filter(
+        (mentor) => !users.some((user) => user.id === mentor.id)
+      ),
+    ];
   },
 
   // Admin endpoints
