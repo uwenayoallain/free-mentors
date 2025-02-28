@@ -244,7 +244,7 @@ const Navbar = () => {
               </>
             ) : (
               <Box>
-                <Button color="inherit" component={ RouterLink } to="/auth/login">
+                <Button color="inherit" variant="outlined" component={ RouterLink } to="/auth/login">
                   Login
                 </Button>
                 <Button

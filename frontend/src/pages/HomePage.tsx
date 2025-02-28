@@ -319,7 +319,7 @@ const HomePage: React.FC = () => {
       {/* Call To Action */ }
       <Box
         sx={ {
-          bgcolor: "secondary.main",
+          bgcolor: "primary.light",
           color: "white",
           py: 6,
           borderRadius: 2,
@@ -331,7 +331,7 @@ const HomePage: React.FC = () => {
         </Typography>
         <Typography
           variant="body1"
-          paragraph
+          component={ "p" }
           sx={ { maxWidth: 700, mx: "auto", mb: 4 } }
         >
           Join our community today to connect with mentors or become a mentor
