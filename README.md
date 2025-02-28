@@ -19,7 +19,7 @@ The project is organized into two main directories:
 ```
 free-mentors/
 ├── frontend/       # React/TypeScript frontend application
-├── backend/        # Node.js/Express backend API
+├── backend/        # 
 └── README.md       # This file
 ```
 
@@ -33,7 +33,7 @@ The frontend is built with:
 - React Router for navigation
 - Vite for development and building
 
-See the [frontend README](/free-mentors/frontend/README.md) for more details.
+See the [frontend README](/frontend/README.md) for more details.
 
 ## Backend
 
