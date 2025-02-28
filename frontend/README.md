@@ -1,50 +1,112 @@
-# React + TypeScript + Vite
+# Free Mentors Frontend | Sample Project
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-19.0.0-61DAFB?logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-3178C6?logo=typescript)
+![MUI](https://img.shields.io/badge/MUI-6.4.6-007FFF?logo=mui)
+![Vite](https://img.shields.io/badge/Vite-6.2.0-646CFF?logo=vite)
 
-Currently, two official plugins are available:
+Frontend application for Free Mentors - a platform connecting aspiring professionals with experienced mentors.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Overview
 
-## Expanding the ESLint configuration
+Free Mentors is designed to bridge the gap between mentors and mentees. The platform creates opportunities for professional growth through targeted mentorship sessions, knowledge sharing, and career guidance.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## ✨ Features
 
-- Configure the top-level `parserOptions` property like this:
+- **User Authentication**: Secure signup and login functionality
+- **Role-Based Access**: Different features for users, mentors, and administrators
+- **Mentor Discovery**: Browse and filter mentors by expertise and experience
+- **Session Management**: Request, schedule, and track mentoring sessions
+- **Reviews & Ratings**: Provide feedback after completed sessions
+- **Profile Management**: Update personal information and preferences
+- **Admin Dashboard**: Moderate content and manage users
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ["./tsconfig.node.json", "./tsconfig.app.json"],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-});
+## 🛠️ Tech Stack
+
+- **React 19** with TypeScript for the UI
+- **Redux Toolkit** for state management
+- **React Router** for navigation
+- **Material UI** for component styling
+- **React Hook Form** with Zod for form validation
+- **Jest & Testing Library** for testing
+- **Vite** for development and building
+
+## 📦 Installation
+
+1. Clone the repository
+
+   ```bash
+   git clone <repository-url>
+   cd free-mentors/frontend
+   ```
+
+2. Install dependencies
+
+   ```bash
+   pnpm install
+   ```
+
+3. Setup environment variables
+
+   ```bash
+   cp .env.example .env
+   ```
+
+   Configure the necessary environment variables in the .env file.
+
+4. Start the development server
+   ```bash
+   pnpm dev
+   ```
+
+## 🧪 Testing
+
+Run tests with Jest:
+
+```bash
+pnpm test
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+## 📁 Project Structure
 
-```js
-// eslint.config.js
-import react from "eslint-plugin-react";
-
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: "18.3" } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs["jsx-runtime"].rules,
-  },
-});
 ```
+frontend/
+├── public/           # Static files
+├── src/
+│   ├── api/          # API client and types
+│   ├── components/   # Reusable UI components
+│   ├── hooks/        # Custom React hooks
+│   ├── pages/        # Page components
+│   ├── store/        # Redux store configuration
+│   ├── theme/        # MUI theme customization
+│   ├── utils/        # Utility functions
+│   ├── App.tsx       # Root component
+│   └── main.tsx      # Entry point
+├── tests/            # Test files
+├── package.json      # Dependencies and scripts
+└── tsconfig.json     # TypeScript configuration
+```
+
+## 🔧 Available Scripts
+
+- `pnpm dev` - Start development server
+- `pnpm build` - Build for production
+- `pnpm lint` - Run ESLint
+- `pnpm preview` - Preview production build
+- `pnpm test` - Run tests
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+## 📬 Contact
+
+Project Link: [https://github.com/uwenayoallain/free-mentors](https://github.com/uwenayoallain/free-mentors)
