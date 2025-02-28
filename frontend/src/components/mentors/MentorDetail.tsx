@@ -20,15 +20,14 @@ import {
 } from "@mui/material";
 import {
   Event as EventIcon,
-  Star as StarIcon,
   Person as PersonIcon,
   WorkOutline as WorkIcon,
   AccessTime as TimeIcon,
 } from "@mui/icons-material";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
-import { Mentor, Review, UserRole } from "../../api/types";
-import RequestSessionForm from "../sessions/RequestSessionForm";
+import { RootState } from "@/store";
+import { Mentor, Review, UserRole } from "@/api/types";
+import RequestSessionForm from "@/components/sessions/RequestSessionForm";
 
 interface MentorDetailProps {
   mentor: Mentor;
@@ -54,158 +53,158 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
 
   return (
     <Box>
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={4}>
-          <Box sx={{ position: "sticky", top: 24 }}>
-            <Paper sx={{ p: 3, mb: 3 }}>
+      <Grid container spacing={ 4 }>
+        <Grid item xs={ 12 } md={ 4 }>
+          <Box sx={ { position: "sticky", top: 24 } }>
+            <Paper sx={ { p: 3, mb: 3 } }>
               <Box
-                sx={{
+                sx={ {
                   display: "flex",
                   flexDirection: "column",
                   alignItems: "center",
                   mb: 3,
-                }}
+                } }
               >
                 <Avatar
                   src={
                     mentor.profilePicture ||
                     `https://i.pravatar.cc/300?u=${mentor.id}`
                   }
-                  alt={`${mentor.firstName} ${mentor.lastName}`}
-                  sx={{ width: 120, height: 120, mb: 2 }}
+                  alt={ `${mentor.firstName} ${mentor.lastName}` }
+                  sx={ { width: 120, height: 120, mb: 2 } }
                 />
                 <Typography variant="h5" gutterBottom>
-                  {mentor.firstName} {mentor.lastName}
+                  { mentor.firstName } { mentor.lastName }
                 </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                <Box sx={ { display: "flex", alignItems: "center", mb: 1 } }>
                   <Rating
-                    value={mentor.rating}
-                    precision={0.5}
+                    value={ mentor.rating }
+                    precision={ 0.5 }
                     readOnly
                     size="small"
                   />
                   <Typography
                     variant="body2"
                     color="text.secondary"
-                    sx={{ ml: 1 }}
+                    sx={ { ml: 1 } }
                   >
-                    ({mentor.totalReviews} reviews)
+                    ({ mentor.totalReviews } reviews)
                   </Typography>
                 </Box>
               </Box>
 
-              <Divider sx={{ my: 2 }} />
+              <Divider sx={ { my: 2 } } />
 
-              <Box sx={{ mb: 2 }}>
-                <Typography variant="subtitle1" sx={{ mb: 1, fontWeight: 500 }}>
+              <Box sx={ { mb: 2 } }>
+                <Typography variant="subtitle1" sx={ { mb: 1, fontWeight: 500 } }>
                   Area of Expertise
                 </Typography>
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-                  {mentor.expertise.map((skill, index) => (
+                <Box sx={ { display: "flex", flexWrap: "wrap", gap: 1 } }>
+                  { mentor.expertise.map((skill, index) => (
                     <Chip
-                      key={index}
-                      label={skill}
+                      key={ index }
+                      label={ skill }
                       size="small"
                       color="primary"
                     />
-                  ))}
+                  )) }
                 </Box>
               </Box>
 
-              <Box sx={{ mb: 2 }}>
+              <Box sx={ { mb: 2 } }>
                 <Typography
                   variant="subtitle1"
-                  sx={{
+                  sx={ {
                     mb: 1,
                     fontWeight: 500,
                     display: "flex",
                     alignItems: "center",
-                  }}
+                  } }
                 >
-                  <WorkIcon fontSize="small" sx={{ mr: 1 }} />
+                  <WorkIcon fontSize="small" sx={ { mr: 1 } } />
                   Experience
                 </Typography>
                 <Typography variant="body2">
-                  {mentor.yearsOfExperience}{" "}
-                  {mentor.yearsOfExperience === 1 ? "year" : "years"} of
+                  { mentor.yearsOfExperience }{ " " }
+                  { mentor.yearsOfExperience === 1 ? "year" : "years" } of
                   experience
                 </Typography>
               </Box>
 
-              <Box sx={{ mb: 2 }}>
+              <Box sx={ { mb: 2 } }>
                 <Typography
                   variant="subtitle1"
-                  sx={{
+                  sx={ {
                     mb: 1,
                     fontWeight: 500,
                     display: "flex",
                     alignItems: "center",
-                  }}
+                  } }
                 >
-                  <TimeIcon fontSize="small" sx={{ mr: 1 }} />
+                  <TimeIcon fontSize="small" sx={ { mr: 1 } } />
                   Available Days
                 </Typography>
                 <Typography variant="body2">
-                  {mentor.availableDays.join(", ")}
+                  { mentor.availableDays.join(", ") }
                 </Typography>
               </Box>
 
-              {isAuthenticated && user?.role !== UserRole.MENTOR && (
+              { isAuthenticated && user?.role !== UserRole.MENTOR && (
                 <Button
                   variant="contained"
                   color="primary"
                   fullWidth
-                  startIcon={<EventIcon />}
-                  onClick={handleOpenDialog}
-                  sx={{ mt: 2 }}
+                  startIcon={ <EventIcon /> }
+                  onClick={ handleOpenDialog }
+                  sx={ { mt: 2 } }
                 >
                   Request Session
                 </Button>
-              )}
+              ) }
             </Paper>
           </Box>
         </Grid>
 
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid item xs={ 12 } md={ 8 }>
+          <Paper sx={ { p: 3, mb: 3 } }>
             <Typography variant="h6" gutterBottom>
               About
             </Typography>
             <Typography variant="body1" paragraph>
-              {mentor.bio || "No bio provided."}
+              { mentor.bio || "No bio provided." }
             </Typography>
           </Paper>
 
-          <Paper sx={{ p: 3 }}>
+          <Paper sx={ { p: 3 } }>
             <Box
-              sx={{
+              sx={ {
                 display: "flex",
                 justifyContent: "space-between",
                 alignItems: "center",
                 mb: 3,
-              }}
+              } }
             >
-              <Typography variant="h6">Reviews ({reviews.length})</Typography>
+              <Typography variant="h6">Reviews ({ reviews.length })</Typography>
             </Box>
 
-            {reviews.length === 0 ? (
-              <Box sx={{ py: 2, textAlign: "center" }}>
+            { reviews.length === 0 ? (
+              <Box sx={ { py: 2, textAlign: "center" } }>
                 <Typography variant="body1" color="text.secondary">
                   No reviews yet.
                 </Typography>
               </Box>
             ) : (
-              <Grid container spacing={2}>
-                {reviews.map((review) => (
-                  <Grid item xs={12} key={review.id}>
+              <Grid container spacing={ 2 }>
+                { reviews.map((review) => (
+                  <Grid item xs={ 12 } key={ review.id }>
                     <Card variant="outlined">
                       <CardContent>
                         <Box
-                          sx={{ display: "flex", alignItems: "center", mb: 1 }}
+                          sx={ { display: "flex", alignItems: "center", mb: 1 } }
                         >
                           <PersonIcon
                             fontSize="small"
-                            sx={{ mr: 1, color: "text.secondary" }}
+                            sx={ { mr: 1, color: "text.secondary" } }
                           />
                           <Typography
                             variant="subtitle2"
@@ -215,51 +214,51 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                           </Typography>
                         </Box>
                         <Box
-                          sx={{ display: "flex", alignItems: "center", mb: 2 }}
+                          sx={ { display: "flex", alignItems: "center", mb: 2 } }
                         >
                           <Rating
-                            value={review.rating}
-                            precision={0.5}
+                            value={ review.rating }
+                            precision={ 0.5 }
                             readOnly
                             size="small"
                           />
                           <Typography
                             variant="caption"
                             color="text.secondary"
-                            sx={{ ml: 1 }}
+                            sx={ { ml: 1 } }
                           >
-                            {new Date(review.createdAt).toLocaleDateString()}
+                            { new Date(review.createdAt).toLocaleDateString() }
                           </Typography>
                         </Box>
                         <Typography variant="body2">
-                          {review.comment}
+                          { review.comment }
                         </Typography>
                       </CardContent>
                     </Card>
                   </Grid>
-                ))}
+                )) }
               </Grid>
-            )}
+            ) }
           </Paper>
         </Grid>
       </Grid>
 
       <Dialog
-        open={dialogOpen}
-        onClose={handleCloseDialog}
+        open={ dialogOpen }
+        onClose={ handleCloseDialog }
         fullWidth
         maxWidth="sm"
-        fullScreen={isMobile}
+        fullScreen={ isMobile }
       >
         <DialogTitle>Request a Mentorship Session</DialogTitle>
         <DialogContent dividers>
           <RequestSessionForm
-            mentorId={mentor.id}
-            onSuccess={handleCloseDialog}
+            mentorId={ mentor.id }
+            onSuccess={ handleCloseDialog }
           />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={ handleCloseDialog }>Cancel</Button>
         </DialogActions>
       </Dialog>
     </Box>

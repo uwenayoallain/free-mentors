@@ -24,9 +24,9 @@ import {
   CalendarToday as CalendarIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
-import { Session, SessionStatus, UserRole } from "../../api/types";
-import { updateSessionStatus, createReview } from "../../store/sessionsSlice";
+import { AppDispatch, RootState } from "@/store";
+import { Session, SessionStatus, UserRole } from "@/api/types";
+import { updateSessionStatus, createReview } from "@/store/sessionsSlice";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";

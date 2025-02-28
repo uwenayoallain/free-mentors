@@ -21,15 +21,23 @@ export interface User {
   profilePicture?: string;
   createdAt: string;
   updatedAt: string;
+  // Mentor-specific fields, present when role === UserRole.MENTOR
+  expertise?: string[];
+  rating?: number;
+  totalReviews?: number;
+  yearsOfExperience?: number;
+  availableDays?: string[];
 }
 
-export interface Mentor extends User {
+// You can keep this type alias for clarity
+export type Mentor = User & {
+  role: UserRole.MENTOR;
   expertise: string[];
   rating: number;
   totalReviews: number;
   yearsOfExperience: number;
   availableDays: string[];
-}
+};
 
 export interface Session {
   id: string;

@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Typography, Button, Container } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import Layout from "../components/common/Layout";
+import Layout from "@/components/common/Layout";
 
 const NotFoundPage: React.FC = () => {
   const navigate = useNavigate();
@@ -10,14 +10,14 @@ const NotFoundPage: React.FC = () => {
     <Layout>
       <Container maxWidth="md">
         <Box
-          sx={{
+          sx={ {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
             textAlign: "center",
             py: 8,
-          }}
+          } }
         >
           <Typography variant="h1" component="h1" gutterBottom color="primary">
             404
@@ -29,7 +29,7 @@ const NotFoundPage: React.FC = () => {
             variant="body1"
             paragraph
             color="text.secondary"
-            sx={{ mb: 4, maxWidth: 600 }}
+            sx={ { mb: 4, maxWidth: 600 } }
           >
             The page you are looking for might have been removed, had its name
             changed, or is temporarily unavailable.
@@ -38,7 +38,7 @@ const NotFoundPage: React.FC = () => {
             variant="contained"
             color="primary"
             size="large"
-            onClick={() => navigate("/")}
+            onClick={ () => navigate("/") }
           >
             Return to Home
           </Button>

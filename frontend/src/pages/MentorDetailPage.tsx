@@ -3,15 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Box, Button, Typography } from "@mui/material";
 import { ArrowBack as ArrowBackIcon } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch, RootState } from "@/store";
 import {
   fetchMentor,
   fetchMentorReviews,
   clearCurrentMentor,
-} from "../store/mentorsSlice";
-import Layout from "../components/common/Layout";
-import MentorDetail from "../components/mentors/MentorDetail";
-import Loading from "../components/common/Loading";
+} from "@/store/usersSlice";
+import Layout from "@/components/common/Layout";
+import MentorDetail from "@/components/mentors/MentorDetail";
+import Loading from "@/components/common/Loading";
 
 const MentorDetailPage: React.FC = () => {
   const { mentorId } = useParams<{ mentorId: string }>();
@@ -19,7 +19,7 @@ const MentorDetailPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   const { currentMentor, reviews, isLoading, error } = useSelector(
-    (state: RootState) => state.mentors,
+    (state: RootState) => state.users,
   );
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const MentorDetailPage: React.FC = () => {
   if (error || !currentMentor) {
     return (
       <Layout>
-        <Box sx={{ textAlign: "center", py: 8 }}>
+        <Box sx={ { textAlign: "center", py: 8 } }>
           <Typography variant="h5" gutterBottom>
             Mentor Not Found
           </Typography>
@@ -53,8 +53,8 @@ const MentorDetailPage: React.FC = () => {
           </Typography>
           <Button
             variant="contained"
-            startIcon={<ArrowBackIcon />}
-            onClick={() => navigate("/mentors")}
+            startIcon={ <ArrowBackIcon /> }
+            onClick={ () => navigate("/mentors") }
           >
             Back to Mentors
           </Button>
@@ -65,16 +65,16 @@ const MentorDetailPage: React.FC = () => {
 
   return (
     <Layout>
-      <Box sx={{ mb: 3 }}>
+      <Box sx={ { mb: 3 } }>
         <Button
-          startIcon={<ArrowBackIcon />}
-          onClick={() => navigate("/mentors")}
+          startIcon={ <ArrowBackIcon /> }
+          onClick={ () => navigate("/mentors") }
         >
           Back to Mentors
         </Button>
       </Box>
 
-      <MentorDetail mentor={currentMentor} reviews={reviews} />
+      <MentorDetail mentor={ currentMentor } reviews={ reviews } />
     </Layout>
   );
 };

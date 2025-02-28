@@ -1,13 +1,20 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { mockApi } from "../api/mockApi";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
+import { mockApi } from "@/api/mockApi";
 import {
   ApiError,
+  Mentor,
   Review,
   ReviewInput,
   Session,
   SessionInput,
   SessionStatus,
-} from "../api/types";
+  User,
+} from "@/api/types";
+import { RootState } from "@/store";
 
 interface SessionsState {
   sessions: Session[];
@@ -65,7 +72,7 @@ export const updateSessionStatus = createAsyncThunk<
     }
 
     return response.data!;
-  },
+  }
 );
 
 export const createReview = createAsyncThunk<
@@ -81,6 +88,29 @@ export const createReview = createAsyncThunk<
 
   return response.data!;
 });
+
+// Create selectors
+export const selectSessions = (state: RootState) => state.sessions.sessions;
+export const selectUsers = (state: RootState) => state.users.list;
+export const selectCurrentUser = (state: RootState) => state.auth.user;
+
+// Compose selector for session details
+export const getSessionWithDetails = createSelector(
+  [selectSessions, selectUsers, selectCurrentUser],
+  (sessions, users, currentUser) => {
+    return sessions.map((session: Session) => {
+      const mentor = users.find((user: User) => user.id === session.mentorId);
+      const user = users.find((user: User) => user.id === session.userId);
+
+      return {
+        ...session,
+        mentor: (mentor as Mentor) ?? null,
+        user,
+        isOwner: currentUser?.id === session.userId,
+      };
+    });
+  }
+);
 
 const sessionsSlice = createSlice({
   name: "sessions",
@@ -133,7 +163,7 @@ const sessionsSlice = createSlice({
     builder.addCase(updateSessionStatus.fulfilled, (state, action) => {
       state.isLoading = false;
       const index = state.sessions.findIndex(
-        (session) => session.id === action.payload.id,
+        (session) => session.id === action.payload.id
       );
       if (index !== -1) {
         state.sessions[index] = action.payload;

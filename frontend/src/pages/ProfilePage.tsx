@@ -13,9 +13,9 @@ import {
   Chip,
 } from "@mui/material";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
-import Layout from "../components/common/Layout";
-import { UserRole } from "../api/types";
+import { RootState } from "@/store";
+import Layout from "@/components/common/Layout";
+import { UserRole } from "@/api/types";
 
 const ProfilePage: React.FC = () => {
   const { user } = useSelector((state: RootState) => state.auth);
@@ -32,96 +32,96 @@ const ProfilePage: React.FC = () => {
 
   return (
     <Layout>
-      <Grid container spacing={4}>
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3 }}>
+      <Grid container spacing={ 4 }>
+        <Grid item xs={ 12 } md={ 4 }>
+          <Paper sx={ { p: 3 } }>
             <Box
-              sx={{
+              sx={ {
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
                 mb: 4,
-              }}
+              } }
             >
               <Avatar
                 src={
                   user.profilePicture ||
                   `https://i.pravatar.cc/300?u=${user.id}`
                 }
-                alt={`${user.firstName} ${user.lastName}`}
-                sx={{ width: 120, height: 120, mb: 2 }}
+                alt={ `${user.firstName} ${user.lastName}` }
+                sx={ { width: 120, height: 120, mb: 2 } }
               />
               <Typography variant="h5" gutterBottom>
-                {user.firstName} {user.lastName}
+                { user.firstName } { user.lastName }
               </Typography>
               <Chip
-                label={user.role}
-                color={user.role === UserRole.MENTOR ? "primary" : "default"}
+                label={ user.role }
+                color={ user.role === UserRole.MENTOR ? "primary" : "default" }
               />
             </Box>
 
-            <Divider sx={{ my: 2 }} />
+            <Divider sx={ { my: 2 } } />
 
             <Typography variant="subtitle1" gutterBottom>
               Account Information
             </Typography>
             <Typography variant="body2" gutterBottom>
-              <strong>Email:</strong> {user.email}
+              <strong>Email:</strong> { user.email }
             </Typography>
             <Typography variant="body2" gutterBottom>
-              <strong>Member Since:</strong>{" "}
-              {new Date(user.createdAt).toLocaleDateString()}
+              <strong>Member Since:</strong>{ " " }
+              { new Date(user.createdAt).toLocaleDateString() }
             </Typography>
           </Paper>
         </Grid>
 
-        <Grid item xs={12} md={8}>
-          <Paper sx={{ p: 3, mb: 3 }}>
+        <Grid item xs={ 12 } md={ 8 }>
+          <Paper sx={ { p: 3, mb: 3 } }>
             <Typography variant="h6" gutterBottom>
               Profile Information
             </Typography>
 
             <Box component="form" noValidate>
-              <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+              <Grid container spacing={ 2 }>
+                <Grid item xs={ 12 } sm={ 6 }>
                   <TextField
                     fullWidth
                     label="First Name"
-                    defaultValue={user.firstName}
+                    defaultValue={ user.firstName }
                     margin="normal"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid item xs={ 12 } sm={ 6 }>
                   <TextField
                     fullWidth
                     label="Last Name"
-                    defaultValue={user.lastName}
+                    defaultValue={ user.lastName }
                     margin="normal"
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={ 12 }>
                   <TextField
                     fullWidth
                     label="Email"
-                    defaultValue={user.email}
+                    defaultValue={ user.email }
                     margin="normal"
                     disabled
                   />
                 </Grid>
-                <Grid item xs={12}>
+                <Grid item xs={ 12 }>
                   <TextField
                     fullWidth
                     label="Bio"
-                    defaultValue={user.bio || ""}
+                    defaultValue={ user.bio || "" }
                     margin="normal"
                     multiline
-                    minRows={4}
+                    minRows={ 4 }
                     placeholder="Tell us about yourself..."
                   />
                 </Grid>
               </Grid>
 
-              <Box sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}>
+              <Box sx={ { mt: 3, display: "flex", justifyContent: "flex-end" } }>
                 <Button variant="contained" color="primary">
                   Save Changes
                 </Button>
@@ -129,8 +129,8 @@ const ProfilePage: React.FC = () => {
             </Box>
           </Paper>
 
-          {isMentor && (
-            <Paper sx={{ p: 3 }}>
+          { isMentor && (
+            <Paper sx={ { p: 3 } }>
               <Typography variant="h6" gutterBottom>
                 Mentor Settings
               </Typography>
@@ -154,7 +154,7 @@ const ProfilePage: React.FC = () => {
                 />
 
                 <Box
-                  sx={{ mt: 3, display: "flex", justifyContent: "flex-end" }}
+                  sx={ { mt: 3, display: "flex", justifyContent: "flex-end" } }
                 >
                   <Button variant="contained" color="primary">
                     Update Mentor Profile
@@ -162,7 +162,7 @@ const ProfilePage: React.FC = () => {
                 </Box>
               </Box>
             </Paper>
-          )}
+          ) }
         </Grid>
       </Grid>
     </Layout>

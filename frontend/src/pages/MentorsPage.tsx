@@ -1,8 +1,8 @@
 import React, { useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../store";
-import { fetchMentors } from "../store/mentorsSlice";
+import { AppDispatch } from "@/store";
+import { fetchMentors } from "@/store/usersSlice";
 import Layout from "@/components/common/Layout";
 import MentorsList from "@/components/mentors/MentorsList";
 
@@ -16,13 +16,13 @@ const MentorsPage: React.FC = () => {
   return (
     <Layout>
       <Paper
-        sx={{
+        sx={ {
           p: 4,
           mb: 4,
           background: "linear-gradient(to right, #1976d2, #64b5f6)",
-        }}
+        } }
       >
-        <Box sx={{ color: "white", maxWidth: 800 }}>
+        <Box sx={ { color: "white", maxWidth: 800 } }>
           <Typography variant="h4" gutterBottom>
             Find Your Mentor
           </Typography>

@@ -21,15 +21,15 @@ import {
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store";
-import { fetchMentors } from "../store/mentorsSlice";
-import Layout from "../components/common/Layout";
-import MentorCard from "../components/mentors/MentorCard";
+import { AppDispatch, RootState } from "@/store";
+import Layout from "@/components/common/Layout";
+import MentorCard from "@/components/mentors/MentorCard";
+import { fetchMentors, selectMentors } from "@/store/usersSlice";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const { mentors } = useSelector((state: RootState) => state.mentors);
+  const mentors = useSelector(selectMentors);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
@@ -40,16 +40,16 @@ const HomePage: React.FC = () => {
 
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* Hero Section */ }
       <Box
-        sx={{
+        sx={ {
           bgcolor: "primary.main",
           color: "white",
           py: 8,
           borderRadius: 2,
           textAlign: "center",
           mb: 6,
-        }}
+        } }
       >
         <Container maxWidth="md">
           <Typography
@@ -66,51 +66,51 @@ const HomePage: React.FC = () => {
           <Typography
             variant="body1"
             paragraph
-            sx={{ mt: 2, mb: 4, maxWidth: 700, mx: "auto" }}
+            sx={ { mt: 2, mb: 4, maxWidth: 700, mx: "auto" } }
           >
             Free Mentors is a social initiative where accomplished professionals
             become role models to young people to provide free mentorship
             sessions. Get guidance, advice, and support from experts in various
             fields.
           </Typography>
-          <Box sx={{ mt: 4 }}>
+          <Box sx={ { mt: 4 } }>
             <Button
               variant="contained"
               color="secondary"
               size="large"
-              onClick={() => navigate("/mentors")}
-              sx={{
+              onClick={ () => navigate("/mentors") }
+              sx={ {
                 mr: 2,
                 px: 4,
                 py: 1.5,
                 fontWeight: "bold",
                 fontSize: "1.1rem",
-              }}
+              } }
             >
               Find a Mentor
             </Button>
-            {!isAuthenticated && (
+            { !isAuthenticated && (
               <Button
                 variant="outlined"
                 color="inherit"
                 size="large"
-                onClick={() => navigate("/auth/signup")}
-                sx={{
+                onClick={ () => navigate("/auth/signup") }
+                sx={ {
                   px: 4,
                   py: 1.5,
                   fontWeight: "bold",
                   fontSize: "1.1rem",
-                }}
+                } }
               >
                 Join Now
               </Button>
-            )}
+            ) }
           </Box>
         </Container>
       </Box>
 
-      {/* How It Works Section */}
-      <Box sx={{ mb: 6 }}>
+      {/* How It Works Section */ }
+      <Box sx={ { mb: 6 } }>
         <Typography variant="h4" component="h2" gutterBottom align="center">
           How It Works
         </Typography>
@@ -118,24 +118,24 @@ const HomePage: React.FC = () => {
           variant="body1"
           paragraph
           align="center"
-          sx={{ mb: 4, maxWidth: 700, mx: "auto" }}
+          sx={ { mb: 4, maxWidth: 700, mx: "auto" } }
         >
           Free Mentors connects individuals seeking guidance with experienced
           professionals willing to share their knowledge and expertise.
         </Typography>
 
-        <Stack direction={{ xs: "column", md: "row" }} spacing={3}>
-          <Box sx={{ flex: 1, width: "100%" }}>
+        <Stack direction={ { xs: "column", md: "row" } } spacing={ 3 }>
+          <Box sx={ { flex: 1, width: "100%" } }>
             <Paper
-              sx={{
+              sx={ {
                 p: 3,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-              }}
+              } }
             >
-              <PeopleIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
+              <PeopleIcon color="primary" sx={ { fontSize: 60, mb: 2 } } />
               <Typography variant="h6" gutterBottom align="center">
                 Find a Mentor
               </Typography>
@@ -145,17 +145,17 @@ const HomePage: React.FC = () => {
               </Typography>
             </Paper>
           </Box>
-          <Box sx={{ flex: 1, width: "100%" }}>
+          <Box sx={ { flex: 1, width: "100%" } }>
             <Paper
-              sx={{
+              sx={ {
                 p: 3,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-              }}
+              } }
             >
-              <EventNoteIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
+              <EventNoteIcon color="primary" sx={ { fontSize: 60, mb: 2 } } />
               <Typography variant="h6" gutterBottom align="center">
                 Request a Session
               </Typography>
@@ -165,17 +165,17 @@ const HomePage: React.FC = () => {
               </Typography>
             </Paper>
           </Box>
-          <Box sx={{ flex: 1, width: "100%" }}>
+          <Box sx={ { flex: 1, width: "100%" } }>
             <Paper
-              sx={{
+              sx={ {
                 p: 3,
                 height: "100%",
                 display: "flex",
                 flexDirection: "column",
                 alignItems: "center",
-              }}
+              } }
             >
-              <SchoolIcon color="primary" sx={{ fontSize: 60, mb: 2 }} />
+              <SchoolIcon color="primary" sx={ { fontSize: 60, mb: 2 } } />
               <Typography variant="h6" gutterBottom align="center">
                 Grow and Learn
               </Typography>
@@ -188,8 +188,8 @@ const HomePage: React.FC = () => {
         </Stack>
       </Box>
 
-      {/* Featured Mentors Section */}
-      <Box sx={{ mb: 6 }}>
+      {/* Featured Mentors Section */ }
+      <Box sx={ { mb: 6 } }>
         <Typography variant="h4" component="h2" gutterBottom align="center">
           Featured Mentors
         </Typography>
@@ -197,58 +197,58 @@ const HomePage: React.FC = () => {
           variant="body1"
           paragraph
           align="center"
-          sx={{ mb: 4, maxWidth: 700, mx: "auto" }}
+          sx={ { mb: 4, maxWidth: 700, mx: "auto" } }
         >
           Meet some of our highly rated mentors who are making a difference.
         </Typography>
 
         <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={3}
-          sx={{ flexWrap: { sm: "wrap" } }}
+          direction={ { xs: "column", sm: "row" } }
+          spacing={ 3 }
+          sx={ { flexWrap: { sm: "wrap" } } }
         >
-          {featuredMentors.map((mentor) => (
+          { featuredMentors.map((mentor) => (
             <Box
-              key={mentor.id}
-              sx={{
+              key={ mentor.id }
+              sx={ {
                 flex: {
                   xs: "1 1 100%",
                   sm: "1 1 calc(50% - 16px)",
                   md: "1 1 calc(33.33% - 16px)",
                 },
                 mb: { xs: 3, sm: 0 },
-              }}
+              } }
             >
-              <MentorCard mentor={mentor} />
+              <MentorCard mentor={ mentor } />
             </Box>
-          ))}
+          )) }
         </Stack>
 
-        <Box sx={{ textAlign: "center", mt: 4 }}>
+        <Box sx={ { textAlign: "center", mt: 4 } }>
           <Button
             variant="outlined"
             color="primary"
             size="large"
-            onClick={() => navigate("/mentors")}
+            onClick={ () => navigate("/mentors") }
           >
             View All Mentors
           </Button>
         </Box>
       </Box>
 
-      {/* Benefits Section */}
-      <Box sx={{ mb: 6 }}>
+      {/* Benefits Section */ }
+      <Box sx={ { mb: 6 } }>
         <Typography variant="h4" component="h2" gutterBottom align="center">
           Benefits
         </Typography>
 
         <Stack
-          direction={{ xs: "column", md: "row" }}
-          spacing={4}
+          direction={ { xs: "column", md: "row" } }
+          spacing={ 4 }
           alignItems="stretch"
         >
-          <Box sx={{ width: { xs: "100%", md: "50%" } }}>
-            <Paper sx={{ p: 4, height: "100%" }}>
+          <Box sx={ { width: { xs: "100%", md: "50%" } } }>
+            <Paper sx={ { p: 4, height: "100%" } }>
               <Typography variant="h5" gutterBottom color="primary">
                 For Mentees
               </Typography>
@@ -280,8 +280,8 @@ const HomePage: React.FC = () => {
               </List>
             </Paper>
           </Box>
-          <Box sx={{ width: { xs: "100%", md: "50%" } }}>
-            <Paper sx={{ p: 4, height: "100%" }}>
+          <Box sx={ { width: { xs: "100%", md: "50%" } } }>
+            <Paper sx={ { p: 4, height: "100%" } }>
               <Typography variant="h5" gutterBottom color="primary">
                 For Mentors
               </Typography>
@@ -316,15 +316,15 @@ const HomePage: React.FC = () => {
         </Stack>
       </Box>
 
-      {/* Call To Action */}
+      {/* Call To Action */ }
       <Box
-        sx={{
+        sx={ {
           bgcolor: "secondary.main",
           color: "white",
           py: 6,
           borderRadius: 2,
           textAlign: "center",
-        }}
+        } }
       >
         <Typography variant="h4" component="h2" gutterBottom>
           Ready to Get Started?
@@ -332,7 +332,7 @@ const HomePage: React.FC = () => {
         <Typography
           variant="body1"
           paragraph
-          sx={{ maxWidth: 700, mx: "auto", mb: 4 }}
+          sx={ { maxWidth: 700, mx: "auto", mb: 4 } }
         >
           Join our community today to connect with mentors or become a mentor
           yourself.
@@ -341,17 +341,17 @@ const HomePage: React.FC = () => {
           variant="contained"
           color="primary"
           size="large"
-          onClick={() =>
+          onClick={ () =>
             isAuthenticated ? navigate("/mentors") : navigate("/auth/signup")
           }
-          sx={{
+          sx={ {
             px: 4,
             py: 1.5,
             fontWeight: "bold",
             fontSize: "1.1rem",
-          }}
+          } }
         >
-          {isAuthenticated ? "Explore Mentors" : "Join Free Mentors"}
+          { isAuthenticated ? "Explore Mentors" : "Join Free Mentors" }
         </Button>
       </Box>
     </Layout>
