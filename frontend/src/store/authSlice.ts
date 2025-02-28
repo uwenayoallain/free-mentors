@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { mockApi } from "../api/mockApi";
-import { ApiError, LoginInput, SignupInput, User } from "../api/types";
+import { mockApi } from "@/api/mockApi";
+import { ApiError, LoginInput, SignupInput, User } from "@/api/types";
 
 interface AuthState {
   user: User | null;

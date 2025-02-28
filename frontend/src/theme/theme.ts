@@ -3,55 +3,81 @@ import { createTheme } from "@mui/material/styles";
 const theme = createTheme({
   palette: {
     primary: {
-      main: "#1976d2",
-      light: "#4791db",
-      dark: "#115293",
+      main: "#4f46e5",
+      light: "#818cf8",
+      dark: "#3730a3",
+      contrastText: "#ffffff",
     },
     secondary: {
-      main: "#ff9800",
-      light: "#ffb74d",
-      dark: "#f57c00",
+      main: "#f97316", // Vibrant orange that creates beautiful contrast
+      light: "#fb923c",
+      dark: "#ea580c",
+      contrastText: "#ffffff",
     },
     background: {
-      default: "#f5f5f5",
+      default: "#f8fafc",
       paper: "#ffffff",
     },
     error: {
-      main: "#f44336",
+      main: "#ef4444",
+      light: "#f87171",
+      dark: "#dc2626",
+      contrastText: "#ffffff",
     },
     success: {
-      main: "#4caf50",
+      main: "#22c55e",
+      light: "#4ade80",
+      dark: "#16a34a",
+      contrastText: "#ffffff",
     },
     warning: {
-      main: "#ff9800",
+      main: "#f59e0b",
+      light: "#fbbf24",
+      dark: "#d97706",
+      contrastText: "#ffffff",
     },
     info: {
-      main: "#2196f3",
+      main: "#0ea5e9",
+      light: "#38bdf8",
+      dark: "#0284c7",
+      contrastText: "#ffffff",
     },
+    text: {
+      primary: "#334155",
+      secondary: "#64748b", // Keeping this slate for text - works well with both primary/secondary
+    },
+    divider: "rgba(100, 116, 139, 0.12)",
   },
   typography: {
-    fontFamily: "'Open Sans', sans-serif",
+    fontFamily: "'Poppins', 'Open Sans', sans-serif",
     h1: {
       fontSize: "2.5rem",
-      fontWeight: 500,
+      fontWeight: 600,
+      letterSpacing: "-0.025em",
     },
     h2: {
       fontSize: "2rem",
-      fontWeight: 500,
+      fontWeight: 600,
+      letterSpacing: "-0.0125em",
     },
     h3: {
       fontSize: "1.75rem",
-      fontWeight: 500,
+      fontWeight: 600,
+      letterSpacing: "-0.0125em",
     },
     h4: {
       fontSize: "1.5rem",
-      fontWeight: 500,
+      fontWeight: 600,
     },
     h5: {
       fontSize: "1.25rem",
-      fontWeight: 500,
+      fontWeight: 600,
     },
     h6: {
+      fontSize: "1.125rem",
+      fontWeight: 600,
+    },
+    subtitle1: {
       fontSize: "1rem",
       fontWeight: 500,
     },
@@ -63,29 +89,67 @@ const theme = createTheme({
     },
     button: {
       textTransform: "none",
+      fontWeight: 500,
     },
+  },
+  shape: {
+    borderRadius: 12,
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
           borderRadius: 8,
-          padding: "8px 16px",
+          padding: "10px 20px",
+          boxShadow: "none",
+          "&:hover": {
+            boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
+          },
         },
+        containedPrimary: {},
+        containedSecondary: {},
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 12,
-          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+          borderRadius: 16,
+          boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
+          transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
+          "&:hover": {
+            transform: "translateY(-4px)",
+            boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
+          },
         },
       },
     },
     MuiAppBar: {
       styleOverrides: {
         root: {
-          boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+          boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          "& .MuiOutlinedInput-root": {
+            borderRadius: 8,
+          },
+        },
+      },
+    },
+    MuiPaper: {
+      styleOverrides: {
+        elevation1: {
+          boxShadow: "0 3px 10px rgba(0,0,0,0.06)",
+        },
+      },
+    },
+    MuiChip: {
+      styleOverrides: {
+        root: {
+          borderRadius: 16,
         },
       },
     },

@@ -2,10 +2,10 @@ import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Box, Container, Paper, Typography } from "@mui/material";
 import { useSelector } from "react-redux";
-import { RootState } from "../store";
-import Layout from "../components/common/Layout";
-import LoginForm from "../components/auth/LoginForm";
-import SignupForm from "../components/auth/SignupForm";
+import { RootState } from "@/store";
+import Layout from "@/components/common/Layout";
+import LoginForm from "@/components/auth/LoginForm";
+import SignupForm from "@/components/auth/SignupForm";
 
 const AuthPage: React.FC = () => {
   const { authType } = useParams<{ authType: string }>();
@@ -27,15 +27,15 @@ const AuthPage: React.FC = () => {
   return (
     <Layout maxWidth="md">
       <Box
-        sx={{
+        sx={ {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           minHeight: "80vh",
-        }}
+        } }
       >
-        {authType === "login" ? <LoginForm /> : <SignupForm />}
+        { authType === "login" ? <LoginForm /> : <SignupForm /> }
       </Box>
     </Layout>
   );

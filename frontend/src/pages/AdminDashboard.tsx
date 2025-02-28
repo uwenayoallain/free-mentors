@@ -28,25 +28,27 @@ import {
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import {
-  fetchMentors,
-  changeMentorStatus,
-  hideReview,
-} from "../store/mentorsSlice";
-import { fetchSessions } from "../store/sessionsSlice";
+import { fetchSessions } from "@/store/sessionsSlice";
 import Layout from "@/components/common/Layout";
 import Loading from "@/components/common/Loading";
-import { UserRole, User, Review } from "../api/types";
+import { UserRole, User, Review } from "@/api/types";
 import { mockApi } from "@/api/mockApi";
+import {
+  fetchMentors,
+  selectMentors,
+  selectReviews,
+  changeMentorStatus,
+  hideReview
+} from "@/store/usersSlice";
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
-  const {
-    mentors,
-    reviews,
-    isLoading: mentorsLoading,
-  } = useSelector((state: RootState) => state.mentors);
-  const { sessions, isLoading: sessionsLoading } = useSelector(
+
+  const mentors = useSelector(selectMentors);
+  const reviews = useSelector(selectReviews);
+  const isLoading = useSelector((state: RootState) => state.users.isLoading);
+
+  const { sessions } = useSelector(
     (state: RootState) => state.sessions,
   );
   const { user } = useSelector((state: RootState) => state.auth);
@@ -59,9 +61,7 @@ const AdminDashboard: React.FC = () => {
   const [action, setAction] = useState<"promote" | "demote" | null>(null);
 
   useEffect(() => {
-    // In a real application, this would be an API call to get all users
-    // For the mock version, we'll combine our existing data
-    const allUsers = mockApi.getAllUsers ? mockApi.getAllUsers() : [];
+    const allUsers = mockApi.getUsers ? mockApi.getUsers() : [];
     setUsersList(allUsers);
 
     dispatch(fetchMentors());
@@ -98,8 +98,7 @@ const AdminDashboard: React.FC = () => {
           }),
         ).unwrap();
 
-        // Refresh the users list (in a real app, this would be another API call)
-        const updatedUsers = mockApi.getAllUsers ? mockApi.getAllUsers() : [];
+        const updatedUsers = mockApi.getUsers ? mockApi.getUsers() : [];
         setUsersList(updatedUsers);
 
         handleCloseDialog();
@@ -124,13 +123,12 @@ const AdminDashboard: React.FC = () => {
       user.email.toLowerCase().includes(searchTerm),
   );
 
-  // Filter reviews to show all (including hidden ones in a real app)
-  const allReviews: Review[] = reviews; // In a real app, fetch all reviews including hidden ones
+  const allReviews: Review[] = reviews;
 
   if (!user || user.role !== UserRole.ADMIN) {
     return (
       <Layout>
-        <Box sx={{ textAlign: "center", py: 8 }}>
+        <Box sx={ { textAlign: "center", py: 8 } }>
           <Typography variant="h5" gutterBottom>
             Access Denied
           </Typography>
@@ -141,8 +139,6 @@ const AdminDashboard: React.FC = () => {
       </Layout>
     );
   }
-
-  const isLoading = mentorsLoading || sessionsLoading;
 
   if (isLoading && !usersList.length) {
     return (
@@ -155,13 +151,13 @@ const AdminDashboard: React.FC = () => {
   return (
     <Layout>
       <Paper
-        sx={{
+        sx={ {
           p: 4,
           mb: 4,
           background: "linear-gradient(to right, #1976d2, #64b5f6)",
-        }}
+        } }
       >
-        <Box sx={{ color: "white" }}>
+        <Box sx={ { color: "white" } }>
           <Typography variant="h4" gutterBottom>
             Admin Dashboard
           </Typography>
@@ -172,11 +168,11 @@ const AdminDashboard: React.FC = () => {
         </Box>
       </Paper>
 
-      <Box sx={{ mb: 4 }}>
+      <Box sx={ { mb: 4 } }>
         <Tabs
-          value={tabValue}
-          onChange={handleTabChange}
-          sx={{ borderBottom: 1, borderColor: "divider" }}
+          value={ tabValue }
+          onChange={ handleTabChange }
+          sx={ { borderBottom: 1, borderColor: "divider" } }
         >
           <Tab label="User Management" id="tab-0" />
           <Tab label="Session Overview" id="tab-1" />
@@ -184,34 +180,34 @@ const AdminDashboard: React.FC = () => {
         </Tabs>
       </Box>
 
-      {/* User Management Tab */}
-      <Box role="tabpanel" hidden={tabValue !== 0}>
-        {tabValue === 0 && (
+      {/* User Management Tab */ }
+      <Box role="tabpanel" hidden={ tabValue !== 0 }>
+        { tabValue === 0 && (
           <Box>
             <Stack
-              direction={{ xs: "column", sm: "row" }}
-              spacing={2}
-              alignItems={{ xs: "flex-start", sm: "center" }}
+              direction={ { xs: "column", sm: "row" } }
+              spacing={ 2 }
+              alignItems={ { xs: "flex-start", sm: "center" } }
               justifyContent="space-between"
-              sx={{ mb: 3 }}
+              sx={ { mb: 3 } }
             >
               <Typography variant="h6">Users</Typography>
               <TextField
                 placeholder="Search users..."
                 size="small"
-                sx={{ width: { xs: "100%", sm: 300 } }}
-                onChange={handleSearchChange}
-                InputProps={{
+                sx={ { width: { xs: "100%", sm: 300 } } }
+                onChange={ handleSearchChange }
+                InputProps={ {
                   startAdornment: (
                     <InputAdornment position="start">
                       <SearchIcon />
                     </InputAdornment>
                   ),
-                }}
+                } }
               />
             </Stack>
 
-            <TableContainer component={Paper}>
+            <TableContainer component={ Paper }>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -223,13 +219,13 @@ const AdminDashboard: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {filteredUsers.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-                      <TableCell>{user.email}</TableCell>
+                  { filteredUsers.map((user) => (
+                    <TableRow key={ user.id }>
+                      <TableCell>{ `${user.firstName} ${user.lastName}` }</TableCell>
+                      <TableCell>{ user.email }</TableCell>
                       <TableCell>
                         <Chip
-                          label={user.role}
+                          label={ user.role }
                           color={
                             user.role === UserRole.ADMIN
                               ? "error"
@@ -241,10 +237,10 @@ const AdminDashboard: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        {new Date(user.createdAt).toLocaleDateString()}
+                        { new Date(user.createdAt).toLocaleDateString() }
                       </TableCell>
                       <TableCell>
-                        {user.role !== UserRole.ADMIN && (
+                        { user.role !== UserRole.ADMIN && (
                           <Button
                             variant="outlined"
                             size="small"
@@ -258,7 +254,7 @@ const AdminDashboard: React.FC = () => {
                                 <PersonAddIcon />
                               )
                             }
-                            onClick={() =>
+                            onClick={ () =>
                               handleOpenDialog(
                                 user,
                                 user.role === UserRole.MENTOR
@@ -267,37 +263,37 @@ const AdminDashboard: React.FC = () => {
                               )
                             }
                           >
-                            {user.role === UserRole.MENTOR
+                            { user.role === UserRole.MENTOR
                               ? "Remove Mentor Status"
-                              : "Make Mentor"}
+                              : "Make Mentor" }
                           </Button>
-                        )}
+                        ) }
                       </TableCell>
                     </TableRow>
-                  ))}
-                  {filteredUsers.length === 0 && (
+                  )) }
+                  { filteredUsers.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} align="center">
+                      <TableCell colSpan={ 5 } align="center">
                         No users found
                       </TableCell>
                     </TableRow>
-                  )}
+                  ) }
                 </TableBody>
               </Table>
             </TableContainer>
           </Box>
-        )}
+        ) }
       </Box>
 
-      {/* Session Overview Tab */}
-      <Box role="tabpanel" hidden={tabValue !== 1}>
-        {tabValue === 1 && (
+      {/* Session Overview Tab */ }
+      <Box role="tabpanel" hidden={ tabValue !== 1 }>
+        { tabValue === 1 && (
           <Box>
-            <Typography variant="h6" sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={ { mb: 3 } }>
               Sessions Overview
             </Typography>
 
-            <TableContainer component={Paper}>
+            <TableContainer component={ Paper }>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -309,7 +305,7 @@ const AdminDashboard: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {sessions.map((session) => {
+                  { sessions.map((session) => {
                     const mentor = mentors.find(
                       (m) => m.id === session.mentorId,
                     );
@@ -318,21 +314,21 @@ const AdminDashboard: React.FC = () => {
                     );
 
                     return (
-                      <TableRow key={session.id}>
-                        <TableCell>{session.title}</TableCell>
+                      <TableRow key={ session.id }>
+                        <TableCell>{ session.title }</TableCell>
                         <TableCell>
-                          {mentor
+                          { mentor
                             ? `${mentor.firstName} ${mentor.lastName}`
-                            : "Unknown Mentor"}
+                            : "Unknown Mentor" }
                         </TableCell>
                         <TableCell>
-                          {mentee
+                          { mentee
                             ? `${mentee.firstName} ${mentee.lastName}`
-                            : "Unknown User"}
+                            : "Unknown User" }
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={session.status}
+                            label={ session.status }
                             color={
                               session.status === "ACCEPTED"
                                 ? "success"
@@ -346,34 +342,34 @@ const AdminDashboard: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          {new Date(session.createdAt).toLocaleDateString()}
+                          { new Date(session.createdAt).toLocaleDateString() }
                         </TableCell>
                       </TableRow>
                     );
-                  })}
-                  {sessions.length === 0 && (
+                  }) }
+                  { sessions.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5} align="center">
+                      <TableCell colSpan={ 5 } align="center">
                         No sessions found
                       </TableCell>
                     </TableRow>
-                  )}
+                  ) }
                 </TableBody>
               </Table>
             </TableContainer>
           </Box>
-        )}
+        ) }
       </Box>
 
-      {/* Reviews Moderation Tab */}
-      <Box role="tabpanel" hidden={tabValue !== 2}>
-        {tabValue === 2 && (
+      {/* Reviews Moderation Tab */ }
+      <Box role="tabpanel" hidden={ tabValue !== 2 }>
+        { tabValue === 2 && (
           <Box>
-            <Typography variant="h6" sx={{ mb: 3 }}>
+            <Typography variant="h6" sx={ { mb: 3 } }>
               Reviews Moderation
             </Typography>
 
-            <TableContainer component={Paper}>
+            <TableContainer component={ Paper }>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -386,7 +382,7 @@ const AdminDashboard: React.FC = () => {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {allReviews.map((review) => {
+                  { allReviews.map((review) => {
                     const mentor = mentors.find(
                       (m) => m.id === review.mentorId,
                     );
@@ -395,83 +391,83 @@ const AdminDashboard: React.FC = () => {
                     );
 
                     return (
-                      <TableRow key={review.id}>
+                      <TableRow key={ review.id }>
                         <TableCell>
-                          {mentor
+                          { mentor
                             ? `${mentor.firstName} ${mentor.lastName}`
-                            : "Unknown Mentor"}
+                            : "Unknown Mentor" }
                         </TableCell>
                         <TableCell>
-                          {review.rating} | {reviewer?.firstName}
+                          { review.rating } | { reviewer?.firstName }
                         </TableCell>
                         <TableCell
-                          sx={{
+                          sx={ {
                             maxWidth: 300,
                             overflow: "hidden",
                             textOverflow: "ellipsis",
                             whiteSpace: "nowrap",
-                          }}
+                          } }
                         >
-                          {review.comment}
+                          { review.comment }
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={review.isHidden ? "Hidden" : "Visible"}
-                            color={review.isHidden ? "error" : "success"}
+                            label={ review.isHidden ? "Hidden" : "Visible" }
+                            color={ review.isHidden ? "error" : "success" }
                             size="small"
                           />
                         </TableCell>
                         <TableCell>
-                          {new Date(review.createdAt).toLocaleDateString()}
+                          { new Date(review.createdAt).toLocaleDateString() }
                         </TableCell>
                         <TableCell>
-                          {!review.isHidden && (
+                          { !review.isHidden && (
                             <Button
                               variant="outlined"
                               size="small"
                               color="error"
-                              onClick={() => handleHideReview(review.id)}
+                              onClick={ () => handleHideReview(review.id) }
                             >
                               Hide Review
                             </Button>
-                          )}
+                          ) }
                         </TableCell>
                       </TableRow>
                     );
-                  })}
-                  {allReviews.length === 0 && (
+                  }) }
+                  { allReviews.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={6} align="center">
+                      <TableCell colSpan={ 6 } align="center">
                         No reviews found
                       </TableCell>
                     </TableRow>
-                  )}
+                  ) }
                 </TableBody>
               </Table>
             </TableContainer>
           </Box>
-        )}
+        ) }
       </Box>
 
-      {/* Change Mentor Status Dialog */}
-      <Dialog open={dialogOpen} onClose={handleCloseDialog}>
+      {/* Change Mentor Status Dialog */ }
+      <Dialog open={ dialogOpen } onClose={ handleCloseDialog }>
         <DialogTitle>
-          {action === "promote"
+          { action === "promote"
             ? "Promote User to Mentor"
-            : "Remove Mentor Status"}
+            : "Remove Mentor Status" }
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
-            {action === "promote"
+            { action === "promote"
               ? `Are you sure you want to make ${selectedUser?.firstName} ${selectedUser?.lastName} a mentor?`
-              : `Are you sure you want to remove ${selectedUser?.firstName} ${selectedUser?.lastName}'s mentor status?`}
+              : `Are you sure you want to remove ${selectedUser?.firstName} ${selectedUser?.lastName}'s mentor status?` }
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog}>Cancel</Button>
+          <Button onClick={ handleCloseDialog }>Cancel</Button>
           <Button
-            onClick={handleChangeMentorStatus}
-            color={action === "promote" ? "primary" : "error"}
+            onClick={ handleChangeMentorStatus }
+            color={ action === "promote" ? "primary" : "error" }
             variant="contained"
           >
             Confirm

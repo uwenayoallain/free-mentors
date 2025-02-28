@@ -1,21 +1,21 @@
 import React, { useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../store";
+import { AppDispatch, RootState } from "@/store";
 import { fetchSessions } from "@/store/sessionsSlice";
-import { fetchMentors } from "../store/mentorsSlice";
 import Layout from "@/components/common/Layout";
 import SessionsList from "@/components/sessions/SessionsList";
 import { UserRole } from "@/api/types";
 import { mockApi } from "@/api/mockApi";
+import { fetchMentors, selectMentors } from "@/store/usersSlice";
 
 const SessionsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { sessions, isLoading } = useSelector(
     (state: RootState) => state.sessions,
   );
-  const { mentors } = useSelector((state: RootState) => state.mentors);
-  const users = mockApi.getAllUsers();
+  const mentors = useSelector(selectMentors);
+  const users = mockApi.getUsers();
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {

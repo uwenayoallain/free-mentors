@@ -10,9 +10,9 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from "@mui/material";
-import { Session, SessionStatus, Mentor, User } from "../../api/types";
+import { Session, SessionStatus, Mentor, User } from "@/api/types";
 import SessionCard from "./SessionCard";
-import Loading from "../common/Loading";
+import Loading from "@/components/common/Loading";
 
 interface SessionsListProps {
   sessions: Session[];

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import {
   Grid,
   Box,
@@ -15,17 +15,16 @@ import {
 } from "@mui/material";
 import { Search as SearchIcon } from "@mui/icons-material";
 import { useSelector } from "react-redux";
-import { RootState } from "../../store";
 import MentorCard from "./MentorCard";
-import Loading from "../common/Loading";
-import { Mentor } from "../../api/types";
+import Loading from "@/components/common/Loading";
+import { selectMentors } from "@/store/usersSlice";
+import { RootState } from "@/store";
 
 const MENTORS_PER_PAGE = 6;
 
 const MentorsList: React.FC = () => {
-  const { mentors, isLoading } = useSelector(
-    (state: RootState) => state.mentors,
-  );
+  const mentors = useSelector(selectMentors);
+  const isLoading = useSelector((state: RootState) => state.users.isLoading);
   const [searchTerm, setSearchTerm] = useState("");
   const [expertise, setExpertise] = useState("all");
   const [page, setPage] = useState(1);
@@ -87,24 +86,24 @@ const MentorsList: React.FC = () => {
 
   return (
     <Box>
-      <Box sx={{ mb: 4 }}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={6}>
+      <Box sx={ { mb: 4 } }>
+        <Grid container spacing={ 2 } alignItems="center">
+          <Grid item xs={ 12 } md={ 6 }>
             <TextField
               fullWidth
               placeholder="Search by name or expertise..."
-              value={searchTerm}
-              onChange={handleSearchChange}
-              InputProps={{
+              value={ searchTerm }
+              onChange={ handleSearchChange }
+              InputProps={ {
                 startAdornment: (
                   <InputAdornment position="start">
                     <SearchIcon />
                   </InputAdornment>
                 ),
-              }}
+              } }
             />
           </Grid>
-          <Grid item xs={12} md={6}>
+          <Grid item xs={ 12 } md={ 6 }>
             <FormControl fullWidth>
               <InputLabel id="expertise-filter-label">
                 Filter by Expertise
@@ -112,59 +111,59 @@ const MentorsList: React.FC = () => {
               <Select
                 labelId="expertise-filter-label"
                 id="expertise-filter"
-                value={expertise}
+                value={ expertise }
                 label="Filter by Expertise"
-                onChange={handleExpertiseChange}
+                onChange={ handleExpertiseChange }
               >
                 <MenuItem value="all">All Expertise</MenuItem>
-                {availableExpertise.map((skill) => (
-                  <MenuItem key={skill} value={skill}>
-                    {skill}
+                { availableExpertise.map((skill) => (
+                  <MenuItem key={ skill } value={ skill }>
+                    { skill }
                   </MenuItem>
-                ))}
+                )) }
               </Select>
             </FormControl>
           </Grid>
         </Grid>
       </Box>
 
-      {filteredMentors.length === 0 ? (
-        <Box sx={{ py: 8, textAlign: "center" }}>
+      { filteredMentors.length === 0 ? (
+        <Box sx={ { py: 8, textAlign: "center" } }>
           <Typography variant="h6" color="text.secondary">
             No mentors found matching your criteria.
           </Typography>
-          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+          <Typography variant="body1" color="text.secondary" sx={ { mt: 1 } }>
             Try adjusting your search or filters.
           </Typography>
         </Box>
       ) : (
         <>
-          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
-            Showing {paginatedMentors.length} of {filteredMentors.length}{" "}
+          <Typography variant="body2" color="text.secondary" sx={ { mb: 2 } }>
+            Showing { paginatedMentors.length } of { filteredMentors.length }{ " " }
             mentors
           </Typography>
 
-          <Grid container spacing={3}>
-            {paginatedMentors.map((mentor) => (
-              <Grid item key={mentor.id} xs={12} sm={6} md={4}>
-                <MentorCard mentor={mentor} />
+          <Grid container spacing={ 3 }>
+            { paginatedMentors.map((mentor) => (
+              <Grid item key={ mentor.id } xs={ 12 } sm={ 6 } md={ 4 }>
+                <MentorCard mentor={ mentor } />
               </Grid>
-            ))}
+            )) }
           </Grid>
 
-          {pageCount > 1 && (
-            <Stack alignItems="center" sx={{ mt: 4 }}>
+          { pageCount > 1 && (
+            <Stack alignItems="center" sx={ { mt: 4 } }>
               <Pagination
-                count={pageCount}
-                page={page}
-                onChange={handlePageChange}
+                count={ pageCount }
+                page={ page }
+                onChange={ handlePageChange }
                 color="primary"
                 size="large"
               />
             </Stack>
-          )}
+          ) }
         </>
-      )}
+      ) }
     </Box>
   );
 };

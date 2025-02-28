@@ -11,7 +11,7 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store";
+import { AppDispatch, RootState } from "@/store";
 import { createSession } from "@/store/sessionsSlice";
 import { addDays } from "date-fns";
 

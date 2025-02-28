@@ -36,10 +36,6 @@ const users: User[] = [
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   },
-];
-
-// Mock mentors data
-const mentors: Mentor[] = [
   {
     id: "3",
     email: "sarah.johnson@example.com",
@@ -224,7 +220,9 @@ export const mockApi = {
     // In a mock environment, we'll accept any registered email with any password
     const user =
       users.find((user) => user.email === input.email) ||
-      mentors.find((mentor) => mentor.email === input.email);
+      users.find(
+        (user) => user.email === input.email && user.role === UserRole.MENTOR
+      );
     if (!user) {
       return {
         error: {
@@ -255,13 +253,18 @@ export const mockApi = {
 
   // Mentor endpoints
   getMentors: async (): Promise<ApiResponse<Mentor[]>> => {
-    await delay(500);
-    return { data: mentors };
+    await delay(300);
+    const mentorUsers = users.filter(
+      (user) => user.role === UserRole.MENTOR
+    ) as Mentor[];
+    return { data: mentorUsers };
   },
 
   getMentor: async (id: string): Promise<ApiResponse<Mentor>> => {
     await delay(300);
-    const mentor = mentors.find((mentor) => mentor.id === id);
+    const mentor = users.find(
+      (user) => user.id === id && user.role === UserRole.MENTOR
+    ) as Mentor;
 
     if (!mentor) {
       return {
@@ -288,13 +291,8 @@ export const mockApi = {
     return { data: mockStorage.user };
   },
 
-  getAllUsers: (): User[] => {
-    return [
-      ...users,
-      ...mentors.filter(
-        (mentor) => !users.some((user) => user.id === mentor.id)
-      ),
-    ];
+  getUsers: (): User[] => {
+    return users;
   },
 
   // Admin endpoints
@@ -320,10 +318,10 @@ export const mockApi = {
       };
     }
 
+    const user = users[userIndex];
+
     if (makeMentor) {
-      // Convert user to mentor
-      const user = users[userIndex];
-      const newMentor: Mentor = {
+      users[userIndex] = {
         ...user,
         role: UserRole.MENTOR,
         expertise: [],
@@ -333,23 +331,17 @@ export const mockApi = {
         availableDays: ["Monday", "Wednesday", "Friday"],
         updatedAt: new Date().toISOString(),
       };
-
-      users[userIndex] = newMentor;
-      mentors.push(newMentor);
-
-      return { data: newMentor };
     } else {
-      // Convert mentor to user
-      const mentorIndex = mentors.findIndex((mentor) => mentor.id === userId);
-      if (mentorIndex !== -1) {
-        mentors.splice(mentorIndex, 1);
-      }
-
-      users[userIndex].role = UserRole.USER;
-      users[userIndex].updatedAt = new Date().toISOString();
-
-      return { data: users[userIndex] };
+      // Convert mentor to user by changing role and keeping base properties
+      users[userIndex] = {
+        ...user,
+        role: UserRole.USER,
+        updatedAt: new Date().toISOString(),
+        // The mentor-specific fields will remain but be ignored
+      };
     }
+
+    return { data: users[userIndex] };
   },
 
   // Session endpoints
@@ -387,7 +379,9 @@ export const mockApi = {
       };
     }
 
-    const mentor = mentors.find((mentor) => mentor.id === input.mentorId);
+    const mentor = users.find(
+      (user) => user.id === input.mentorId && user.role === UserRole.MENTOR
+    ) as Mentor;
     if (!mentor) {
       return {
         error: {
@@ -503,8 +497,8 @@ export const mockApi = {
     reviews.push(newReview);
 
     // Update mentor rating
-    const mentorIndex = mentors.findIndex(
-      (mentor) => mentor.id === session.mentorId
+    const mentorIndex = users.findIndex(
+      (user) => user.id === session.mentorId && user.role === UserRole.MENTOR
     );
     if (mentorIndex !== -1) {
       const mentorReviews = reviews.filter(
@@ -515,8 +509,8 @@ export const mockApi = {
         0
       );
 
-      mentors[mentorIndex].totalReviews = mentorReviews.length;
-      mentors[mentorIndex].rating = parseFloat(
+      (users[mentorIndex] as Mentor).totalReviews = mentorReviews.length;
+      (users[mentorIndex] as Mentor).rating = parseFloat(
         (totalRating / mentorReviews.length).toFixed(1)
       );
     }
@@ -548,7 +542,9 @@ export const mockApi = {
 
     // Update mentor rating
     const mentorId = reviews[reviewIndex].mentorId;
-    const mentorIndex = mentors.findIndex((mentor) => mentor.id === mentorId);
+    const mentorIndex = users.findIndex(
+      (user) => user.id === mentorId && user.role === UserRole.MENTOR
+    );
 
     if (mentorIndex !== -1) {
       const mentorReviews = reviews.filter(
@@ -556,15 +552,15 @@ export const mockApi = {
       );
 
       if (mentorReviews.length === 0) {
-        mentors[mentorIndex].rating = 0;
-        mentors[mentorIndex].totalReviews = 0;
+        (users[mentorIndex] as Mentor).rating = 0;
+        (users[mentorIndex] as Mentor).totalReviews = 0;
       } else {
         const totalRating = mentorReviews.reduce(
           (sum, review) => sum + review.rating,
           0
         );
-        mentors[mentorIndex].totalReviews = mentorReviews.length;
-        mentors[mentorIndex].rating = parseFloat(
+        (users[mentorIndex] as Mentor).totalReviews = mentorReviews.length;
+        (users[mentorIndex] as Mentor).rating = parseFloat(
           (totalRating / mentorReviews.length).toFixed(1)
         );
       }
