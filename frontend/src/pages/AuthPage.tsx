@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Box, Container, Paper, Typography } from "@mui/material";
+import { Box } from "@mui/material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import Layout from "@/components/common/Layout";

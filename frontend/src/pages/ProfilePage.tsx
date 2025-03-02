@@ -8,8 +8,6 @@ import {
   TextField,
   Button,
   Divider,
-  Card,
-  CardContent,
   Chip,
 } from "@mui/material";
 import { useSelector } from "react-redux";

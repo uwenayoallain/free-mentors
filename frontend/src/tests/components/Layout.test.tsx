@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import * as sessionsSlice from '@/store/sessionsSlice';
@@ -405,10 +404,10 @@ describe('Layout Component', () => {
         });
 
         // Mock dispatch actions
-        jest.spyOn(sessionsSlice, 'clearSessionError').mockImplementation(() => ({ type: 'sessions/clearSessionError' }));
-        jest.spyOn(sessionsSlice, 'clearSuccessMessage').mockImplementation(() => ({ type: 'sessions/clearSuccessMessage' }));
-        jest.spyOn(usersSlice, 'clearError').mockImplementation(() => ({ type: 'users/clearError' }));
-        jest.spyOn(authSlice, 'clearErrors').mockImplementation(() => ({ type: 'auth/clearErrors' }));
+        jest.spyOn(sessionsSlice, 'clearSessionError').mockImplementation(() => ({ payload: undefined, type: 'sessions/clearSessionError' }));
+        jest.spyOn(sessionsSlice, 'clearSuccessMessage').mockImplementation(() => ({ payload: undefined, type: 'sessions/clearSuccessMessage' }));
+        jest.spyOn(usersSlice, 'clearError').mockImplementation(() => ({ payload: undefined, type: 'users/clearError' }));
+        jest.spyOn(authSlice, 'clearErrors').mockImplementation(() => ({ payload: undefined, type: 'auth/clearErrors' }));
     });
 
     afterEach(() => {
@@ -561,60 +560,60 @@ describe('Layout Component', () => {
         );
 
         fireEvent.click(screen.getByLabelText(/close/i));
-        fireEvent.click(screen.getByLabelText(/close/i));
 
         expect(usersSlice.clearError).toHaveBeenCalled();
+    });
 
-        it('should dispatch clearSessionError when closing session error alert', () => {
-            const errorStore = createTestStore({
-                auth: { error: null },
-                users: { error: null },
-                sessions: { error: { message: 'Session error message' }, successMessage: null },
-            });
-
-            render(
-                <Provider store={ errorStore }>
-                    <Layout>
-                        <div>Content</div>
-                    </Layout>
-                </Provider>
-            );
-
-            fireEvent.click(screen.getByLabelText(/close/i));
-
-            fireEvent.click(screen.getByLabelText(/close/i));
-
-            expect(sessionsSlice.clearSessionError).toHaveBeenCalled();
-            it('should dispatch clearSuccessMessage when closing success alert', () => {
-                const successStore = createTestStore({
-                    auth: { error: null },
-                    users: { error: null },
-                    sessions: { error: null, successMessage: 'Success message' },
-                });
-
-                render(
-                    <Provider store={ successStore }>
-                        <Layout>
-                            <div>Content</div>
-                        </Layout>
-                    </Provider>
-                );
-
-                fireEvent.click(screen.getByLabelText(/close/i));
-
-                const actions = successStore.getActions();
-                fireEvent.click(screen.getByLabelText(/close/i));
-
-                expect(sessionsSlice.clearSuccessMessage).toHaveBeenCalled();
-                render(
-                    <Provider store={ store }>
-                        <Layout maxWidth="sm">
-                            <div>Content</div>
-                        </Layout>
-                    </Provider>
-                );
-
-                const mainElement = screen.getByRole('main');
-                expect(mainElement).toBeInTheDocument();
-            });
+    it('should dispatch clearSessionError when closing session error alert', () => {
+        const errorStore = createTestStore({
+            auth: { error: null },
+            users: { error: null },
+            sessions: { error: { message: 'Session error message' }, successMessage: null },
         });
+
+        render(
+            <Provider store={ errorStore }>
+                <Layout>
+                    <div>Content</div>
+                </Layout>
+            </Provider>
+        );
+
+        fireEvent.click(screen.getByLabelText(/close/i));
+
+        expect(sessionsSlice.clearSessionError).toHaveBeenCalled();
+    });
+
+    it('should dispatch clearSuccessMessage when closing success alert', () => {
+        const successStore = createTestStore({
+            auth: { error: null },
+            users: { error: null },
+            sessions: { error: null, successMessage: 'Success message' },
+        });
+
+        render(
+            <Provider store={ successStore }>
+                <Layout>
+                    <div>Content</div>
+                </Layout>
+            </Provider>
+        );
+
+        fireEvent.click(screen.getByLabelText(/close/i));
+
+        expect(sessionsSlice.clearSuccessMessage).toHaveBeenCalled();
+    });
+
+    it('should apply custom maxWidth when provided', () => {
+        render(
+            <Provider store={ store }>
+                <Layout maxWidth="sm">
+                    <div>Content</div>
+                </Layout>
+            </Provider>
+        );
+
+        const mainElement = screen.getByRole('main');
+        expect(mainElement).toBeInTheDocument();
+    });
+});
