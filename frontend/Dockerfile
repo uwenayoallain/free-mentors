@@ -1,18 +1,26 @@
-FROM node:16-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
+FROM node:20-alpine
 
+WORKDIR /app
+
+# Install PNPM
+RUN npm install -g pnpm
+
+# Copy package.json and lockfile, then install dependencies
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+# Copy the rest of the project
 COPY . .
 
-# Build the react app for prod
-RUN npm run build
+# Build the React app with Vite & SWC
+RUN pnpm build
 
-# Expose the port the app runs on
+# Expose port 3000
 EXPOSE 3000
 
-# Install a lightweight http server
-RUN npm install -g serve
+# Serve the built app using "serve" (installed as a project dependency)
+RUN pnpm add serve
 
-# Serve the app
-CMD ["serve", "-s", "build"]
+# Start the app
+CMD ["pnpm", "serve", "-s", "dist", "-l", "3000"]
+
