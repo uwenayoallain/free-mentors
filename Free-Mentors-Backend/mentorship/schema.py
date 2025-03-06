@@ -5,6 +5,7 @@ from graphql import GraphQLError
 from .models import MentorshipSession
 from users.models import User
 from users.utils import get_authenticated_user
+from bson import ObjectId
 
 class MentorshipSessionType(MongoengineObjectType):
     class Meta:
@@ -25,11 +26,18 @@ class Query(graphene.ObjectType):
         return MentorshipSession.objects.all()
     
     def resolve_user_sessions(self, info):
-        # Authenticate the user
         user = get_authenticated_user(info.context)
-        
-        # Get sessions where user is either mentee or mentor
-        return MentorshipSession.objects.filter(__raw__={"$or": [{"mentee": user}, {"mentor": user}]})
+        user_id = ObjectId(user.id)
+    
+        query = {
+        "$or": [
+            {"mentee": user_id},  # Direct comparison with the ObjectId
+            {"mentor": user_id}   # Direct comparison with the ObjectId
+        ]
+        }
+    
+        print(f"Query: {query}")  # Debugging
+        return MentorshipSession.objects.filter(__raw__=query)
 
 class CreateSession(graphene.Mutation):
     session = graphene.Field(MentorshipSessionType)
@@ -65,22 +73,23 @@ class UpdateSessionStatus(graphene.Mutation):
         status = graphene.String(required=True)
     
     def mutate(self, info, session_id, status):
-        # Authenticate the user
+    # Authenticate the user
         user = get_authenticated_user(info.context)
-        
+    
+    # Get the full list of valid status values
         valid_statuses = [s[0] for s in MentorshipSession.STATUS_CHOICES]
         if status not in valid_statuses:
             raise GraphQLError(f'Invalid status. Choose from {", ".join(valid_statuses)}')
-        
+    
         try:
             session = MentorshipSession.objects.get(id=session_id)
         except MentorshipSession.DoesNotExist:
             raise GraphQLError('Session not found')
-        
-        # Only mentor can update status
-        if session.mentor != user:
+    
+    # Only mentor can update status
+        if session.mentor.id != user.id:
             raise GraphQLError('Not authorized')
-        
+    
         session.status = status
         session.save()
         return UpdateSessionStatus(session=session)

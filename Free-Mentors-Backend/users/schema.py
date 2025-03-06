@@ -14,8 +14,6 @@ from graphql_jwt.shortcuts import get_token, get_payload, get_user_by_payload, g
 from datetime import timedelta , datetime , timezone
 from django.conf import settings
 from users.utils import get_authenticated_user
-
-
 import jwt
 
 

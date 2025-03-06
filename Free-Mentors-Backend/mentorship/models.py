@@ -3,7 +3,12 @@ from users.models import User
 import datetime
 
 class MentorshipSession(Document):
-    STATUS_CHOICES = ['pending', 'accepted', 'declined', 'completed']
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('approved', 'Approved'),
+        ('declined', 'Declined'),
+        ('completed', 'Completed')
+    ]
 
     mentor = ReferenceField(User, reverse_delete_rule=CASCADE)
     mentee = ReferenceField(User, reverse_delete_rule=CASCADE)
