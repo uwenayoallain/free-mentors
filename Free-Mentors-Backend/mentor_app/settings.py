@@ -73,7 +73,7 @@ DATABASES = {
 
 
 GRAPHENE = {
-    "SCHEMA": "users.schema.schema",
+    "SCHEMA": "mentor_app.schema.schema",
     "MIDDLEWARE": [
         "graphql_jwt.middleware.JSONWebTokenMiddleware",
     ],
@@ -86,6 +86,11 @@ GRAPHQL_JWT = {
     'JWT_ALLOW_REFRESH': True,
 }
 
+GRAPHQL_AUTH = {
+    "USER_STATUS": False  # This prevents Django from registering the UserStatus model
+}
+
+
 # Add mongoengine settings
 
 
@@ -97,6 +102,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'graphql_auth',
     'graphql_jwt',
     'graphene_django',
     'corsheaders',
