@@ -2,7 +2,8 @@ import graphene
 from graphene_mongo import MongoengineObjectType
 from graphql import GraphQLError
 from graphql_jwt import Refresh, Verify
-from .models import User
+from .models import User 
+from .models import AdminCreationFlag
 from graphql_jwt.shortcuts import get_token
 from graphql_jwt.mutations import ObtainJSONWebToken
 from graphql_jwt import JSONWebTokenMutation
@@ -195,11 +196,51 @@ class UpdateUser(graphene.Mutation):
         user.save()
         return UpdateUser(user=user)
 
+class CreateAdmin(graphene.Mutation):
+    success = graphene.Boolean()
+
+    class Arguments:
+        email = graphene.String(required=True)
+        password = graphene.String(required=True)
+        first_name = graphene.String(required=True)
+        last_name = graphene.String(required=True)
+        bio = graphene.String(required=True)
+        address = graphene.String(required=True)
+        expertise = graphene.String(required=True)
+
+    def mutate(self, info, email, password, first_name, last_name, bio, address, expertise):
+        # Check if the admin has already been created
+        flag = AdminCreationFlag.objects.first()
+        if flag and flag.admin_created:
+            raise GraphQLError("Admin user has already been created.")
+
+        # Create the admin user
+        admin = User(
+            first_name=first_name,
+            last_name=last_name,
+            bio=bio,
+            address=address,
+            expertise=expertise,
+            email=email,
+            user_type="admin",
+            is_staff=True,  # Assuming you have an `is_staff` field for admin users
+        )
+        admin.set_password(password)
+        admin.save()
+
+        # Update the flag to indicate the admin has been created
+        if not flag:
+            flag = AdminCreationFlag()
+        flag.admin_created = True
+        flag.save()
+
+        return CreateAdmin(success=True)
 class Mutation(graphene.ObjectType):
     create_user = CreateUser.Field()
     update_user = UpdateUser.Field()    
     change_to_mentor = ChangeToMentor.Field()
     token_auth = ObtainJSONWebTokenWithEmail.Field()  # Use the custom mutatio
+    create_admin = CreateAdmin.Field()  
     verify_token = Verify.Field()  # Add this to verify tokens
     refresh_token = Refresh.Field()  # Add this to refresh tokens
 
