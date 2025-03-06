@@ -28,17 +28,18 @@ import {
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { fetchSessions } from "@/store/sessionsSlice";
+import { fetchSessions, selectSessions } from "@/store/sessionsSlice";
 import Layout from "@/components/common/Layout";
 import Loading from "@/components/common/Loading";
-import { UserRole, User, Review } from "@/api/types";
-import { mockApi } from "@/api/mockApi";
+import { UserRole, User, Review, SessionStatus } from "@/api/types";
 import {
   fetchMentors,
   selectMentors,
   selectReviews,
   changeMentorStatus,
-  hideReview
+  hideReview,
+  fetchUsers,
+  selectAllUsers,
 } from "@/store/usersSlice";
 
 const AdminDashboard: React.FC = () => {
@@ -47,23 +48,19 @@ const AdminDashboard: React.FC = () => {
   const mentors = useSelector(selectMentors);
   const reviews = useSelector(selectReviews);
   const isLoading = useSelector((state: RootState) => state.users.isLoading);
+  const usersList = useSelector(selectAllUsers);
 
-  const { sessions } = useSelector(
-    (state: RootState) => state.sessions,
-  );
+  const sessions = useSelector(selectSessions);
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [tabValue, setTabValue] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
-  const [usersList, setUsersList] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [action, setAction] = useState<"promote" | "demote" | null>(null);
 
   useEffect(() => {
-    const allUsers = mockApi.getUsers ? mockApi.getUsers() : [];
-    setUsersList(allUsers);
-
+    dispatch(fetchUsers());
     dispatch(fetchMentors());
     dispatch(fetchSessions());
   }, [dispatch]);
@@ -95,12 +92,8 @@ const AdminDashboard: React.FC = () => {
           changeMentorStatus({
             userId: selectedUser.id,
             makeMentor: action === "promote",
-          }),
+          })
         ).unwrap();
-
-        const updatedUsers = mockApi.getUsers ? mockApi.getUsers() : [];
-        setUsersList(updatedUsers);
-
         handleCloseDialog();
       } catch (error) {
         console.error("Failed to change mentor status", error);
@@ -120,7 +113,7 @@ const AdminDashboard: React.FC = () => {
   const filteredUsers = usersList.filter(
     (user) =>
       `${user.firstName} ${user.lastName}`.toLowerCase().includes(searchTerm) ||
-      user.email.toLowerCase().includes(searchTerm),
+      user.email.toLowerCase().includes(searchTerm)
   );
 
   const allReviews: Review[] = reviews;
@@ -237,7 +230,7 @@ const AdminDashboard: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        { new Date(user.createdAt).toLocaleDateString() }
+                        { user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A' }
                       </TableCell>
                       <TableCell>
                         { user.role !== UserRole.ADMIN && (
@@ -245,9 +238,7 @@ const AdminDashboard: React.FC = () => {
                             variant="outlined"
                             size="small"
                             color={
-                              user.role === UserRole.MENTOR
-                                ? "error"
-                                : "primary"
+                              user.role === UserRole.MENTOR ? "error" : "primary"
                             }
                             startIcon={
                               user.role === UserRole.MENTOR ? null : (
@@ -259,7 +250,7 @@ const AdminDashboard: React.FC = () => {
                                 user,
                                 user.role === UserRole.MENTOR
                                   ? "demote"
-                                  : "promote",
+                                  : "promote"
                               )
                             }
                           >
@@ -307,10 +298,10 @@ const AdminDashboard: React.FC = () => {
                 <TableBody>
                   { sessions.map((session) => {
                     const mentor = mentors.find(
-                      (m) => m.id === session.mentorId,
+                      (m) => m.id === session.mentor.id
                     );
                     const mentee = usersList.find(
-                      (u) => u.id === session.userId,
+                      (u) => u.id === session.mentee.id
                     );
 
                     return (
@@ -330,11 +321,11 @@ const AdminDashboard: React.FC = () => {
                           <Chip
                             label={ session.status }
                             color={
-                              session.status === "ACCEPTED"
+                              session.status === SessionStatus.ACCEPTED
                                 ? "success"
-                                : session.status === "DECLINED"
+                                : session.status === SessionStatus.DECLINED
                                   ? "error"
-                                  : session.status === "COMPLETED"
+                                  : session.status === SessionStatus.COMPLETED
                                     ? "info"
                                     : "warning"
                             }
@@ -342,7 +333,7 @@ const AdminDashboard: React.FC = () => {
                           />
                         </TableCell>
                         <TableCell>
-                          { new Date(session.createdAt).toLocaleDateString() }
+                          { session.createdAt ? new Date(session.createdAt).toLocaleDateString() : 'N/A' }
                         </TableCell>
                       </TableRow>
                     );
@@ -384,12 +375,11 @@ const AdminDashboard: React.FC = () => {
                 <TableBody>
                   { allReviews.map((review) => {
                     const mentor = mentors.find(
-                      (m) => m.id === review.mentorId,
+                      (m) => m.id === review.id
                     );
                     const reviewer = usersList.find(
-                      (u) => u.id === review.userId,
+                      (u) => u.id === review.id
                     );
-
                     return (
                       <TableRow key={ review.id }>
                         <TableCell>
@@ -408,20 +398,20 @@ const AdminDashboard: React.FC = () => {
                             whiteSpace: "nowrap",
                           } }
                         >
-                          { review.comment }
+                          { review.content }
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={ review.isHidden ? "Hidden" : "Visible" }
-                            color={ review.isHidden ? "error" : "success" }
+                            label={ review.isVisible ? "Hidden" : "Visible" }
+                            color={ review.isVisible ? "error" : "success" }
                             size="small"
                           />
                         </TableCell>
                         <TableCell>
-                          { new Date(review.createdAt).toLocaleDateString() }
+                          { review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A' }
                         </TableCell>
                         <TableCell>
-                          { !review.isHidden && (
+                          { !review.isVisible && (
                             <Button
                               variant="outlined"
                               size="small"

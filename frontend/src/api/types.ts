@@ -1,14 +1,14 @@
-export enum UserRole {
-  USER = "USER",
-  MENTOR = "MENTOR",
-  ADMIN = "ADMIN",
+export enum UserType {
+  MENTOR = "mentor",
+  MENTEE = "mentee",
+  ADMIN = "admin",
 }
 
 export enum SessionStatus {
-  PENDING = "PENDING",
-  ACCEPTED = "ACCEPTED",
-  DECLINED = "DECLINED",
-  COMPLETED = "COMPLETED",
+  PENDING = "pending",
+  ACCEPTED = "accepted",
+  DECLINED = "declined",
+  COMPLETED = "completed",
 }
 
 export interface User {
@@ -16,51 +16,52 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: UserRole;
+  role: UserType; // Changed to UserType
   bio?: string;
   profilePicture?: string;
-  createdAt: string;
-  updatedAt: string;
-  // Mentor-specific fields, present when role === UserRole.MENTOR
-  expertise?: string[];
-  rating?: number;
-  totalReviews?: number;
-  yearsOfExperience?: number;
-  availableDays?: string[];
+  createdAt?: string;
+  updatedAt?: string;
+  address?: string;
+  occupation?: string;
+  isStaff?: boolean;
+  userType?: UserType; // Changed to UserType
 }
 
-// You can keep this type alias for clarity
 export type Mentor = User & {
-  role: UserRole.MENTOR;
   expertise: string[];
-  rating: number;
-  totalReviews: number;
-  yearsOfExperience: number;
-  availableDays: string[];
 };
 
 export interface Session {
   id: string;
-  mentorId: string;
-  userId: string;
-  title: string;
-  description: string;
+  title?: string;
+  mentor: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  mentee: {
+    id: string;
+    firstName: string;
+    lastName: string;
+  };
+  topic: string;
+  questions: string;
   status: SessionStatus;
   scheduledDate?: string;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface Review {
   id: string;
-  sessionId: string;
-  mentorId: string;
-  userId: string;
+  session: {
+    id: string;
+  };
   rating: number;
-  comment: string;
-  isHidden: boolean;
-  createdAt: string;
-  updatedAt: string;
+  content: string;
+  isVisible?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface AuthResponse {
@@ -73,6 +74,11 @@ export interface SignupInput {
   password: string;
   firstName: string;
   lastName: string;
+  address: string;
+  bio?: string;
+  occupation?: string;
+  expertise?: string;
+  userType?: UserType; // Changed to UserType
 }
 
 export interface LoginInput {
@@ -82,15 +88,15 @@ export interface LoginInput {
 
 export interface SessionInput {
   mentorId: string;
-  title: string;
-  description: string;
+  topic: string;
+  questions: string;
   scheduledDate?: string;
 }
 
 export interface ReviewInput {
   sessionId: string;
   rating: number;
-  comment: string;
+  content: string;
 }
 
 export interface ApiError {

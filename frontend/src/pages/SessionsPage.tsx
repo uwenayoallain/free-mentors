@@ -6,8 +6,7 @@ import { fetchSessions } from "@/store/sessionsSlice";
 import Layout from "@/components/common/Layout";
 import SessionsList from "@/components/sessions/SessionsList";
 import { UserRole } from "@/api/types";
-import { mockApi } from "@/api/mockApi";
-import { fetchMentors, selectMentors } from "@/store/usersSlice";
+import { fetchMentors, selectMentors, fetchUsers, selectAllUsers } from "@/store/usersSlice";
 
 const SessionsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -15,12 +14,13 @@ const SessionsPage: React.FC = () => {
     (state: RootState) => state.sessions,
   );
   const mentors = useSelector(selectMentors);
-  const users = mockApi.getUsers();
+  const users = useSelector(selectAllUsers);
   const { user } = useSelector((state: RootState) => state.auth);
 
   useEffect(() => {
     dispatch(fetchSessions());
     dispatch(fetchMentors());
+    dispatch(fetchUsers());
   }, [dispatch]);
 
   const roleText =

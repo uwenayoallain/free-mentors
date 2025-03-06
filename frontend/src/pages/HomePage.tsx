@@ -58,7 +58,7 @@ const HomePage: React.FC = () => {
             gutterBottom
             fontWeight="bold"
           >
-            Free Mentors
+            Free Mentors Lol
           </Typography>
           <Typography variant="h5" gutterBottom fontWeight="normal">
             Connect with experienced professionals for free mentorship

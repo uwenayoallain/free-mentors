@@ -3,7 +3,7 @@ import {
   createAsyncThunk,
   createSelector,
 } from "@reduxjs/toolkit";
-import { mockApi } from "@/api/mockApi";
+import { api } from "@/api/api"; // Import your actual API
 import {
   ApiError,
   Mentor,
@@ -35,7 +35,7 @@ export const fetchSessions = createAsyncThunk<
   void,
   { rejectValue: ApiError }
 >("sessions/fetchSessions", async (_, { rejectWithValue }) => {
-  const response = await mockApi.getSessions();
+  const response = await api.getSessions();
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -49,7 +49,7 @@ export const createSession = createAsyncThunk<
   SessionInput,
   { rejectValue: ApiError }
 >("sessions/createSession", async (sessionData, { rejectWithValue }) => {
-  const response = await mockApi.createSession(sessionData);
+  const response = await api.createSession(sessionData);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -65,7 +65,7 @@ export const updateSessionStatus = createAsyncThunk<
 >(
   "sessions/updateSessionStatus",
   async ({ sessionId, status }, { rejectWithValue }) => {
-    const response = await mockApi.updateSessionStatus(sessionId, status);
+    const response = await api.updateSessionStatus(sessionId, status);
 
     if (response.error) {
       return rejectWithValue(response.error);
@@ -80,7 +80,7 @@ export const createReview = createAsyncThunk<
   ReviewInput,
   { rejectValue: ApiError }
 >("sessions/createReview", async (reviewData, { rejectWithValue }) => {
-  const response = await mockApi.createReview(reviewData);
+  const response = await api.createReview(reviewData);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -99,14 +99,14 @@ export const getSessionWithDetails = createSelector(
   [selectSessions, selectUsers, selectCurrentUser],
   (sessions, users, currentUser) => {
     return sessions.map((session: Session) => {
-      const mentor = users.find((user: User) => user.id === session.mentorId);
-      const user = users.find((user: User) => user.id === session.userId);
+      const mentor = users.find((user: User) => user.id === session.mentor.id);
+      const user = users.find((user: User) => user.id === session.mentee.id);
 
       return {
         ...session,
         mentor: (mentor as Mentor) ?? null,
         user,
-        isOwner: currentUser?.id === session.userId,
+        isOwner: currentUser?.id === session.mentee.id,
       };
     });
   }

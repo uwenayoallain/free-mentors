@@ -3,7 +3,7 @@ import {
   createAsyncThunk,
   createSelector,
 } from "@reduxjs/toolkit";
-import { mockApi } from "@/api/mockApi";
+import { api } from "@/api/api";
 import { ApiError, Mentor, Review, User, UserRole } from "@/api/types";
 import { RootState } from "@/store";
 
@@ -29,15 +29,13 @@ export const fetchUsers = createAsyncThunk<
   void,
   { rejectValue: ApiError }
 >("users/fetchUsers", async (_, { rejectWithValue }) => {
-  try {
-    const response = mockApi.getUsers();
-    return response;
-  } catch (error) {
-    return rejectWithValue({
-      message: error instanceof Error ? error.message : "Failed to fetch users",
-      status: 500,
-    } as ApiError);
+  const response = await api.getUsers();
+
+  if (response.error) {
+    return rejectWithValue(response.error);
   }
+
+  return response.data!;
 });
 
 // Fetch mentors (specialized users)
@@ -46,7 +44,7 @@ export const fetchMentors = createAsyncThunk<
   void,
   { rejectValue: ApiError }
 >("users/fetchMentors", async (_, { rejectWithValue }) => {
-  const response = await mockApi.getMentors();
+  const response = await api.getMentors();
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -61,7 +59,7 @@ export const fetchMentor = createAsyncThunk<
   string,
   { rejectValue: ApiError }
 >("users/fetchMentor", async (mentorId, { rejectWithValue }) => {
-  const response = await mockApi.getMentor(mentorId);
+  const response = await api.getMentor(mentorId);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -76,7 +74,7 @@ export const fetchMentorReviews = createAsyncThunk<
   string,
   { rejectValue: ApiError }
 >("users/fetchMentorReviews", async (mentorId, { rejectWithValue }) => {
-  const response = await mockApi.getReviews(mentorId);
+  const response = await api.getReviews(mentorId);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -93,7 +91,7 @@ export const changeMentorStatus = createAsyncThunk<
 >(
   "users/changeMentorStatus",
   async ({ userId, makeMentor }, { rejectWithValue, dispatch }) => {
-    const response = await mockApi.changeMentorStatus(userId, makeMentor);
+    const response = await api.changeMentorStatus(userId, makeMentor);
 
     if (response.error) {
       return rejectWithValue(response.error);
@@ -109,7 +107,7 @@ export const hideReview = createAsyncThunk<
   string,
   { rejectValue: ApiError }
 >("users/hideReview", async (reviewId, { rejectWithValue }) => {
-  const response = await mockApi.hideReview(reviewId);
+  const response = await api.hideReview(reviewId);
 
   if (response.error) {
     return rejectWithValue(response.error);
