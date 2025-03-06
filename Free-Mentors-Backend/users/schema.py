@@ -95,8 +95,6 @@ class Query(graphene.ObjectType):
 
 
     def resolve_mentors(self, info):
-    # Authenticate the user
-        authenticated_user = get_authenticated_user(info.context)
     
     # Return all mentors
         return User.objects.filter(user_type='mentor')

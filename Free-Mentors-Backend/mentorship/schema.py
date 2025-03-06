@@ -1,13 +1,12 @@
 # mentorship/schema.py
 import graphene
-from graphene_django import DjangoObjectType
+from graphene_mongo import MongoengineObjectType
 from graphql import GraphQLError
-from django.contrib.auth import get_user_model
 from .models import MentorshipSession
+from users.models import User
+from users.utils import get_authenticated_user
 
-User = get_user_model()
-
-class MentorshipSessionType(DjangoObjectType):
+class MentorshipSessionType(MongoengineObjectType):
     class Meta:
         model = MentorshipSession
 
@@ -16,21 +15,21 @@ class Query(graphene.ObjectType):
     user_sessions = graphene.List(MentorshipSessionType)
     
     def resolve_all_sessions(self, info):
-        if not info.context.user.is_authenticated:
-            raise GraphQLError('You must be logged in')
-        if not info.context.user.is_admin():
+        # Authenticate the user
+        user = get_authenticated_user(info.context)
+        
+        # Ensure the authenticated user is staff (admin)
+        if not user.is_staff:
             raise GraphQLError('Not authorized')
+        
         return MentorshipSession.objects.all()
     
     def resolve_user_sessions(self, info):
-        user = info.context.user
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged in')
+        # Authenticate the user
+        user = get_authenticated_user(info.context)
         
         # Get sessions where user is either mentee or mentor
-        return MentorshipSession.objects.filter(
-            models.Q(mentee=user) | models.Q(mentor=user)
-        )
+        return MentorshipSession.objects.filter(__raw__={"$or": [{"mentee": user}, {"mentor": user}]})
 
 class CreateSession(graphene.Mutation):
     session = graphene.Field(MentorshipSessionType)
@@ -41,9 +40,8 @@ class CreateSession(graphene.Mutation):
         questions = graphene.String(required=True)
     
     def mutate(self, info, mentor_id, topic, questions):
-        user = info.context.user
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged in')
+        # Authenticate the user
+        user = get_authenticated_user(info.context)
         
         try:
             mentor = User.objects.get(id=mentor_id, user_type='mentor')
@@ -67,9 +65,8 @@ class UpdateSessionStatus(graphene.Mutation):
         status = graphene.String(required=True)
     
     def mutate(self, info, session_id, status):
-        user = info.context.user
-        if not user.is_authenticated:
-            raise GraphQLError('You must be logged in')
+        # Authenticate the user
+        user = get_authenticated_user(info.context)
         
         valid_statuses = [s[0] for s in MentorshipSession.STATUS_CHOICES]
         if status not in valid_statuses:
@@ -91,3 +88,5 @@ class UpdateSessionStatus(graphene.Mutation):
 class Mutation(graphene.ObjectType):
     create_session = CreateSession.Field()
     update_session_status = UpdateSessionStatus.Field()
+
+schema = graphene.Schema(query=Query, mutation=Mutation)
