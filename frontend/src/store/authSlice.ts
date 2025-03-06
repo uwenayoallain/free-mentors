@@ -52,6 +52,20 @@ export const login = createAsyncThunk<
   };
 });
 
+export const updateProfile = createAsyncThunk<
+  User,
+  Partial<User>,
+  { rejectValue: ApiError }
+>("auth/updateProfile", async (profileData, { rejectWithValue }) => {
+  const response = await api.updateUser(profileData);
+
+  if (response.error) {
+    return rejectWithValue(response.error);
+  }
+
+  return response.data!;
+});
+
 export const logout = createAsyncThunk(
   "auth/logout",
   async (_, { rejectWithValue }) => {
@@ -146,6 +160,20 @@ const authSlice = createSlice({
     builder.addCase(getProfile.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload || { message: "Failed to get profile" };
+    });
+
+    // Update Profile
+    builder.addCase(updateProfile.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.user = action.payload;
+    });
+    builder.addCase(updateProfile.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload || { message: "Failed to update profile" };
     });
   },
 });

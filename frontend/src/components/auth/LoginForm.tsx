@@ -15,7 +15,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { login } from "@/store/authSlice";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
-import { UserRole } from "@/api/types";
+import { UserType } from "@/api/types";
 
 const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -40,11 +40,11 @@ const LoginForm: React.FC = () => {
   const onSubmit = async (data: LoginFormValues) => {
     try {
       const result = await dispatch(login(data)).unwrap();
-      switch (result.user.role) {
-        case UserRole.ADMIN:
+      switch (result.user.userType) {
+        case UserType.ADMIN:
           navigate("/admin/");
           break;
-        case UserRole.MENTOR:
+        case UserType.MENTOR:
           navigate("/sessions/");
           break;
         default:
@@ -67,13 +67,13 @@ const LoginForm: React.FC = () => {
 
   return (
     <Paper
-      elevation={3}
-      sx={{
+      elevation={ 3 }
+      sx={ {
         p: 4,
         width: "100%",
         maxWidth: 500,
         mx: "auto",
-      }}
+      } }
     >
       <Typography variant="h5" component="h1" gutterBottom align="center">
         Welcome Back
@@ -83,12 +83,12 @@ const LoginForm: React.FC = () => {
         variant="body2"
         color="textSecondary"
         align="center"
-        sx={{ mb: 3 }}
+        sx={ { mb: 3 } }
       >
         Sign in to continue to Free Mentors
       </Typography>
 
-      <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Box component="form" onSubmit={ handleSubmit(onSubmit) } noValidate>
         <TextField
           margin="normal"
           required
@@ -97,9 +97,9 @@ const LoginForm: React.FC = () => {
           label="Email Address"
           autoComplete="email"
           autoFocus
-          {...register("email")}
-          error={!!errors.email}
-          helperText={errors.email?.message}
+          { ...register("email") }
+          error={ !!errors.email }
+          helperText={ errors.email?.message }
         />
 
         <TextField
@@ -110,9 +110,9 @@ const LoginForm: React.FC = () => {
           label="Password"
           type="password"
           autoComplete="current-password"
-          {...register("password")}
-          error={!!errors.password}
-          helperText={errors.password?.message}
+          { ...register("password") }
+          error={ !!errors.password }
+          helperText={ errors.password?.message }
         />
 
         <Button
@@ -121,16 +121,16 @@ const LoginForm: React.FC = () => {
           variant="contained"
           color="primary"
           size="large"
-          disabled={isLoading}
-          sx={{ mt: 3, mb: 2 }}
+          disabled={ isLoading }
+          sx={ { mt: 3, mb: 2 } }
         >
-          {isLoading ? <CircularProgress size={24} /> : "Sign In"}
+          { isLoading ? <CircularProgress size={ 24 } /> : "Sign In" }
         </Button>
 
-        <Box sx={{ textAlign: "center", mt: 2 }}>
+        <Box sx={ { textAlign: "center", mt: 2 } }>
           <Typography variant="body2">
-            Don't have an account?{" "}
-            <Link component={RouterLink} to="/auth/signup" variant="body2">
+            Don't have an account?{ " " }
+            <Link component={ RouterLink } to="/auth/signup" variant="body2">
               Sign up
             </Link>
           </Typography>

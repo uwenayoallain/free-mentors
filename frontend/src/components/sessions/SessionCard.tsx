@@ -21,11 +21,10 @@ import {
   Check as CheckIcon,
   Close as CloseIcon,
   Star as StarIcon,
-  CalendarToday as CalendarIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { Session, SessionStatus, UserRole } from "@/api/types";
+import { Session, SessionStatus, UserType } from "@/api/types";
 import { updateSessionStatus, createReview } from "@/store/sessionsSlice";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -119,7 +118,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
         createReview({
           sessionId: session.id,
           rating: data.rating,
-          comment: data.comment,
+          content: data.comment,
         }),
       ).unwrap();
       handleCloseReviewDialog();
@@ -158,7 +157,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
     }
   };
 
-  const isMentor = user?.role === UserRole.MENTOR;
+  const isMentor = user?.userType === UserType.MENTOR;
   const canTakeAction = isMentor && session.status === SessionStatus.PENDING;
   const canReview = !isMentor && session.status === SessionStatus.COMPLETED;
 
@@ -174,7 +173,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
           } }
         >
           <Typography variant="h6" component="div">
-            { session.title }
+            { session.topic }
           </Typography>
           <Chip
             label={ getStatusChipProps().label }
@@ -184,21 +183,8 @@ const SessionCard: React.FC<SessionCardProps> = ({
         </Box>
 
         <Typography variant="body2" color="text.secondary" paragraph>
-          { session.description }
+          { session.questions }
         </Typography>
-
-        { session.scheduledDate && (
-          <Box sx={ { display: "flex", alignItems: "center", mb: 2 } }>
-            <CalendarIcon
-              fontSize="small"
-              sx={ { mr: 1, color: "text.secondary" } }
-            />
-            <Typography variant="body2" color="text.secondary">
-              Scheduled for:{ " " }
-              { new Date(session.scheduledDate).toLocaleDateString() }
-            </Typography>
-          </Box>
-        ) }
 
         <Box
           sx={ {
@@ -211,9 +197,6 @@ const SessionCard: React.FC<SessionCardProps> = ({
             { isMentor
               ? `Requested by: ${userName || "User"}`
               : `Mentor: ${mentorName || "Mentor"}` }
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Created: { new Date(session.createdAt).toLocaleDateString() }
           </Typography>
         </Box>
 

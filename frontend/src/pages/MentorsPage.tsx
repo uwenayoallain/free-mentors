@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { Box, Typography, Paper } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store";
-import { fetchMentors } from "@/store/usersSlice";
+import { fetchAllMentors } from "@/store/usersSlice";
 import Layout from "@/components/common/Layout";
 import MentorsList from "@/components/mentors/MentorsList";
 
@@ -10,7 +10,7 @@ const MentorsPage: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
-    dispatch(fetchMentors());
+    dispatch(fetchAllMentors());
   }, [dispatch]);
 
   return (

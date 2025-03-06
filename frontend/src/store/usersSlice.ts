@@ -1,35 +1,33 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  createSelector,
-} from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "@/api/api";
-import { ApiError, Mentor, Review, User, UserRole } from "@/api/types";
+import { ApiError, Mentor, Review, User } from "@/api/types";
 import { RootState } from "@/store";
 
 interface UsersState {
-  list: User[]; // Changed from users to list
   currentMentor: Mentor | null;
   reviews: Review[];
   isLoading: boolean;
   error: ApiError | null;
+  allMentors: Mentor[];
+  allUsers: User[];
 }
 
 const initialState: UsersState = {
-  list: [], // Changed from users to list
   currentMentor: null,
   reviews: [],
   isLoading: false,
   error: null,
+  allMentors: [],
+  allUsers: [],
 };
 
-// Fetch all users including mentors
-export const fetchUsers = createAsyncThunk<
-  User[],
+// Fetch current user
+export const fetchCurrentUser = createAsyncThunk<
+  User,
   void,
   { rejectValue: ApiError }
->("users/fetchUsers", async (_, { rejectWithValue }) => {
-  const response = await api.getUsers();
+>("users/fetchCurrentUser", async (_, { rejectWithValue }) => {
+  const response = await api.getProfile();
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -38,13 +36,27 @@ export const fetchUsers = createAsyncThunk<
   return response.data!;
 });
 
-// Fetch mentors (specialized users)
-export const fetchMentors = createAsyncThunk<
+// Fetch all mentors
+export const fetchAllMentors = createAsyncThunk<
+  Mentor[],
+  void,
+  { rejectValue: ApiError }
+>("users/fetchAllMentors", async (_, { rejectWithValue }) => {
+  const response = await api.getMentors();
+
+  if (response.error) {
+    return rejectWithValue(response.error);
+  }
+  return response.data!;
+});
+
+// Fetch all users
+export const fetchAllUsers = createAsyncThunk<
   User[],
   void,
   { rejectValue: ApiError }
->("users/fetchMentors", async (_, { rejectWithValue }) => {
-  const response = await api.getMentors();
+>("users/fetchAllUsers", async (_, { rejectWithValue }) => {
+  const response = await api.getUsers();
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -97,7 +109,7 @@ export const changeMentorStatus = createAsyncThunk<
       return rejectWithValue(response.error);
     }
 
-    dispatch(fetchMentors());
+    dispatch(fetchCurrentUser()); // Refresh currentUser after status change
   }
 );
 
@@ -117,11 +129,9 @@ export const hideReview = createAsyncThunk<
 });
 
 // Selectors
-export const selectAllUsers = (state: RootState) => state.users.list;
-export const selectMentors = createSelector(
-  [selectAllUsers],
-  (users) => users.filter((user) => user.role === UserRole.MENTOR) as Mentor[]
-);
+export const selectAllMentors = (state: RootState) => state.users.allMentors;
+export const selectAllUsers = (state: RootState) => state.users.allUsers;
+
 export const selectCurrentMentor = (state: RootState) =>
   state.users.currentMentor;
 export const selectReviews = (state: RootState) => state.users.reviews;
@@ -139,51 +149,38 @@ const usersSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // Fetch All Users
     builder
-      .addCase(fetchUsers.pending, (state) => {
+      .addCase(fetchAllUsers.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchUsers.fulfilled, (state, action) => {
-        state.list = action.payload; // Changed from users to list
+      .addCase(fetchAllUsers.fulfilled, (state, action) => {
+        state.allUsers = action.payload;
         state.isLoading = false;
       })
-      .addCase(fetchUsers.rejected, (state, action) => {
+      .addCase(fetchAllUsers.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || { message: "Failed to fetch users" };
+        state.error = action.payload || {
+          message: "Failed to fetch all users",
+        };
       });
 
-    // Fetch Mentors
-    builder.addCase(fetchMentors.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchMentors.fulfilled, (state, action) => {
-      state.isLoading = false;
-      // Update users array with mentors
-      const mentors = action.payload.filter(
-        (user) => user.role === UserRole.MENTOR
-      );
-
-      // Add mentors to users array if they don't exist
-      mentors.forEach((mentor) => {
-        const mentorExists = state.list.some((user) => user.id === mentor.id); // Changed from users to list
-        if (!mentorExists) {
-          state.list.push(mentor); // Changed from users to list
-        } else {
-          // Update existing mentor
-          const index = state.list.findIndex((user) => user.id === mentor.id); // Changed from users to list
-          if (index !== -1) {
-            state.list[index] = mentor; // Changed from users to list
-          }
-        }
+    // Fetch All Mentors
+    builder
+      .addCase(fetchAllMentors.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllMentors.fulfilled, (state, action) => {
+        state.allMentors = action.payload; // Update allMentors in state
+        state.isLoading = false;
+      })
+      .addCase(fetchAllMentors.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || {
+          message: "Failed to fetch all mentors",
+        };
       });
-    });
-    builder.addCase(fetchMentors.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload || { message: "Failed to fetch mentors" };
-    });
 
     // Fetch Specific Mentor
     builder.addCase(fetchMentor.pending, (state) => {
@@ -193,16 +190,6 @@ const usersSlice = createSlice({
     builder.addCase(fetchMentor.fulfilled, (state, action) => {
       state.isLoading = false;
       state.currentMentor = action.payload;
-
-      // Update user in the users array if exists
-      const index = state.list.findIndex(
-        (user) => user.id === action.payload.id
-      ); // Changed from users to list
-      if (index !== -1) {
-        state.list[index] = action.payload; // Changed from users to list
-      } else {
-        state.list.push(action.payload); // Changed from users to list
-      }
     });
     builder.addCase(fetchMentor.rejected, (state, action) => {
       state.isLoading = false;

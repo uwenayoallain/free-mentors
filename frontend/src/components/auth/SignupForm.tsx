@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { signup } from "@/store/authSlice";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 const signupSchema = z
   .object({
@@ -39,7 +39,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 const SignupForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading } = useSelector((state: RootState) => state.auth);
-
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -51,7 +51,8 @@ const SignupForm: React.FC = () => {
 
   const onSubmit = async (data: SignupFormValues) => {
     try {
-      const { ...signupData } = data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword, ...signupData } = data;
       await dispatch(signup(signupData)).unwrap();
     } catch (error: unknown) {
       const apiError = error as {
@@ -69,6 +70,9 @@ const SignupForm: React.FC = () => {
           }
         );
       }
+    }
+    finally {
+      navigate('/auth/login')
     }
   };
 

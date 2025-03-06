@@ -24,23 +24,27 @@ import AdminDashboard from "./pages/AdminDashboard";
 
 // Auth protection
 import ProtectedRoute from "./utils/ProtectedRoute";
-import { UserRole } from "./api/types";
+import { UserType } from "./api/types";
 
 const App: React.FC = () => {
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <LocalizationProvider dateAdapter={AdapterDateFns}>
+    <Provider store={ store }>
+      <ThemeProvider theme={ theme }>
+        <LocalizationProvider dateAdapter={ AdapterDateFns }>
           <CssBaseline />
           <Router>
             <Routes>
-              {/* Public Routes */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/auth/:authType" element={<AuthPage />} />
-              <Route path="/mentors" element={<MentorsPage />} />
-              <Route path="/mentors/:mentorId" element={<MentorDetailPage />} />
+              {/* Public Routes */ }
+              <Route path="/" element={ <HomePage /> } />
+              <Route path="/auth/:authType" element={ <AuthPage /> } />
+              <Route path="/mentors" element={ <MentorsPage /> } />
+              <Route path="/mentors/:mentorId" element={
+                <ProtectedRoute>
+                  <MentorDetailPage />
+                </ProtectedRoute>
+              } />
 
-              {/* Protected Routes */}
+              {/* Protected Routes */ }
               <Route
                 path="/sessions"
                 element={
@@ -60,15 +64,15 @@ const App: React.FC = () => {
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute requiredRole={UserRole.ADMIN}>
+                  <ProtectedRoute requiredRole={ UserType.ADMIN }>
                     <AdminDashboard />
                   </ProtectedRoute>
                 }
               />
 
-              {/* Not Found */}
-              <Route path="/404" element={<NotFoundPage />} />
-              <Route path="*" element={<Navigate to="/404" replace />} />
+              {/* Not Found */ }
+              <Route path="/404" element={ <NotFoundPage /> } />
+              <Route path="*" element={ <Navigate to="/404" replace /> } />
             </Routes>
           </Router>
         </LocalizationProvider>

@@ -6,6 +6,7 @@ import Navbar from "./Navbar";
 import { clearSessionError, clearSuccessMessage } from "@/store/sessionsSlice";
 import { clearError as clearUserError } from "@/store/usersSlice";
 import { clearErrors } from "@/store/authSlice";
+import { extractErrorMessage } from "@/utils";
 
 interface LayoutProps {
   children: ReactNode;
@@ -31,8 +32,8 @@ const Layout: React.FC<LayoutProps> = ({ children, maxWidth = "lg" }) => {
     dispatch(clearSuccessMessage());
   };
 
-  const errorMessage =
-    authError?.message || userError?.message || sessionError?.message;
+  const errorMessage = extractErrorMessage(
+    authError?.message || userError?.message || sessionError?.message);
 
   return (
     <Box sx={ { display: "flex", flexDirection: "column", minHeight: "100vh" } }>

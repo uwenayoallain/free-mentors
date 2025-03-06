@@ -20,24 +20,24 @@ import {
   Forum as ForumIcon,
 } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import Layout from "@/components/common/Layout";
 import MentorCard from "@/components/mentors/MentorCard";
-import { fetchMentors, selectMentors } from "@/store/usersSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllMentors, selectAllMentors } from "@/store/usersSlice";
 
 const HomePage: React.FC = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
-  const mentors = useSelector(selectMentors);
   const { isAuthenticated } = useSelector((state: RootState) => state.auth);
-
-  useEffect(() => {
-    dispatch(fetchMentors());
-  }, [dispatch]);
-
+  const mentors = useSelector(selectAllMentors)
+  const dispatch = useDispatch<AppDispatch>();
   const featuredMentors = mentors.slice(0, 3);
-
+  console.log(mentors)
+  useEffect(() => {
+    dispatch(
+      fetchAllMentors()
+    )
+  }, [dispatch])
   return (
     <Layout>
       {/* Hero Section */ }
@@ -58,7 +58,7 @@ const HomePage: React.FC = () => {
             gutterBottom
             fontWeight="bold"
           >
-            Free Mentors Lol
+            Free Mentors
           </Typography>
           <Typography variant="h5" gutterBottom fontWeight="normal">
             Connect with experienced professionals for free mentorship

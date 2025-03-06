@@ -10,22 +10,18 @@ import {
   MenuItem,
   SelectChangeEvent,
 } from "@mui/material";
-import { Session, SessionStatus, Mentor, User } from "@/api/types";
+import { Session, SessionStatus } from "@/api/types";
 import SessionCard from "./SessionCard";
 import Loading from "@/components/common/Loading";
 
 interface SessionsListProps {
   sessions: Session[];
   isLoading: boolean;
-  mentors?: Mentor[];
-  users?: User[];
 }
 
 const SessionsList: React.FC<SessionsListProps> = ({
   sessions,
   isLoading,
-  mentors = [],
-  users = [],
 }) => {
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState(0);
@@ -65,17 +61,6 @@ const SessionsList: React.FC<SessionsListProps> = ({
     );
   }, [filteredSessions]);
 
-  const getMentorName = (mentorId: string) => {
-    const mentor = mentors.find((m) => m.id === mentorId);
-    return mentor && `${mentor.firstName} ${mentor.lastName}`;
-  };
-
-  const getUserName = (userId: string) => {
-    const user = users.find((u) => u.id == userId);
-    console.log(user, userId)
-    return user && `${user.firstName} ${user.lastName}`;
-  };
-
   const renderSessions = (sessionsList: Session[]) => {
     if (sessionsList.length === 0) {
       return (
@@ -91,8 +76,8 @@ const SessionsList: React.FC<SessionsListProps> = ({
       <SessionCard
         key={ session.id }
         session={ session }
-        mentorName={ getMentorName(session.mentorId) }
-        userName={ getUserName(session.userId) }
+        mentorName={ `${session.mentor.firstName} ${session.mentor.lastName}` }
+        userName={ `${session.mentee.firstName} ${session.mentee.lastName}` }
       />
     ));
   };

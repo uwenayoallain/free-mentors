@@ -16,7 +16,6 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
-  role: UserType; // Changed to UserType
   bio?: string;
   profilePicture?: string;
   createdAt?: string;
@@ -25,15 +24,12 @@ export interface User {
   occupation?: string;
   isStaff?: boolean;
   userType?: UserType; // Changed to UserType
+  expertise: string;
 }
 
-export type Mentor = User & {
-  expertise: string[];
-};
-
+export type Mentor = User;
 export interface Session {
   id: string;
-  title?: string;
   mentor: {
     id: string;
     firstName: string;
@@ -47,7 +43,6 @@ export interface Session {
   topic: string;
   questions: string;
   status: SessionStatus;
-  scheduledDate?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -108,3 +103,19 @@ export interface ApiResponse<T> {
   data?: T;
   error?: ApiError;
 }
+
+export type UpdateUserInput = Partial<
+  Pick<
+    User,
+    | "firstName"
+    | "lastName"
+    | "address"
+    | "bio"
+    | "occupation"
+    | "profilePicture"
+  >
+>;
+export type CreateAdminInput = Pick<
+  User,
+  "email" | "firstName" | "lastName" | "address" | "bio" | "occupation"
+>;

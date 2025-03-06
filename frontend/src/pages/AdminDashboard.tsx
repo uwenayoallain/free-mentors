@@ -31,21 +31,19 @@ import { AppDispatch, RootState } from "@/store";
 import { fetchSessions, selectSessions } from "@/store/sessionsSlice";
 import Layout from "@/components/common/Layout";
 import Loading from "@/components/common/Loading";
-import { UserRole, User, Review, SessionStatus } from "@/api/types";
+import { UserType, User, Review, SessionStatus } from "@/api/types";
 import {
-  fetchMentors,
-  selectMentors,
   selectReviews,
   changeMentorStatus,
   hideReview,
-  fetchUsers,
+  fetchAllUsers,
   selectAllUsers,
 } from "@/store/usersSlice";
+import { useNavigate } from "react-router-dom";
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const mentors = useSelector(selectMentors);
   const reviews = useSelector(selectReviews);
   const isLoading = useSelector((state: RootState) => state.users.isLoading);
   const usersList = useSelector(selectAllUsers);
@@ -60,8 +58,7 @@ const AdminDashboard: React.FC = () => {
   const [action, setAction] = useState<"promote" | "demote" | null>(null);
 
   useEffect(() => {
-    dispatch(fetchUsers());
-    dispatch(fetchMentors());
+    dispatch(fetchAllUsers());
     dispatch(fetchSessions());
   }, [dispatch]);
 
@@ -117,20 +114,10 @@ const AdminDashboard: React.FC = () => {
   );
 
   const allReviews: Review[] = reviews;
+  const navigate = useNavigate();
 
-  if (!user || user.role !== UserRole.ADMIN) {
-    return (
-      <Layout>
-        <Box sx={ { textAlign: "center", py: 8 } }>
-          <Typography variant="h5" gutterBottom>
-            Access Denied
-          </Typography>
-          <Typography variant="body1" color="text.secondary">
-            You don't have permission to access the admin dashboard.
-          </Typography>
-        </Box>
-      </Layout>
-    );
+  if (!user || user.userType !== UserType.ADMIN) {
+    navigate("/");
   }
 
   if (isLoading && !usersList.length) {
@@ -207,7 +194,6 @@ const AdminDashboard: React.FC = () => {
                     <TableCell>Name</TableCell>
                     <TableCell>Email</TableCell>
                     <TableCell>Role</TableCell>
-                    <TableCell>Joined Date</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
@@ -218,11 +204,11 @@ const AdminDashboard: React.FC = () => {
                       <TableCell>{ user.email }</TableCell>
                       <TableCell>
                         <Chip
-                          label={ user.role }
+                          label={ user.userType }
                           color={
-                            user.role === UserRole.ADMIN
+                            user.userType === UserType.ADMIN
                               ? "error"
-                              : user.role === UserRole.MENTOR
+                              : user.userType === UserType.MENTOR
                                 ? "primary"
                                 : "default"
                           }
@@ -230,31 +216,28 @@ const AdminDashboard: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        { user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : 'N/A' }
-                      </TableCell>
-                      <TableCell>
-                        { user.role !== UserRole.ADMIN && (
+                        { user.userType !== UserType.ADMIN && (
                           <Button
                             variant="outlined"
                             size="small"
                             color={
-                              user.role === UserRole.MENTOR ? "error" : "primary"
+                              user.userType === UserType.MENTOR ? "error" : "primary"
                             }
                             startIcon={
-                              user.role === UserRole.MENTOR ? null : (
+                              user.userType === UserType.MENTOR ? null : (
                                 <PersonAddIcon />
                               )
                             }
                             onClick={ () =>
                               handleOpenDialog(
                                 user,
-                                user.role === UserRole.MENTOR
+                                user.userType === UserType.MENTOR
                                   ? "demote"
                                   : "promote"
                               )
                             }
                           >
-                            { user.role === UserRole.MENTOR
+                            { user.userType === UserType.MENTOR
                               ? "Remove Mentor Status"
                               : "Make Mentor" }
                           </Button>
@@ -292,30 +275,19 @@ const AdminDashboard: React.FC = () => {
                     <TableCell>Mentor</TableCell>
                     <TableCell>Mentee</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Date Requested</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   { sessions.map((session) => {
-                    const mentor = mentors.find(
-                      (m) => m.id === session.mentor.id
-                    );
-                    const mentee = usersList.find(
-                      (u) => u.id === session.mentee.id
-                    );
 
                     return (
                       <TableRow key={ session.id }>
-                        <TableCell>{ session.title }</TableCell>
+                        <TableCell>{ session.topic }</TableCell>
                         <TableCell>
-                          { mentor
-                            ? `${mentor.firstName} ${mentor.lastName}`
-                            : "Unknown Mentor" }
+                          { session.mentor.firstName } ${ session.mentor.lastName }
                         </TableCell>
                         <TableCell>
-                          { mentee
-                            ? `${mentee.firstName} ${mentee.lastName}`
-                            : "Unknown User" }
+                          { session.mentee.firstName } ${ session.mentee.lastName }
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -331,9 +303,6 @@ const AdminDashboard: React.FC = () => {
                             }
                             size="small"
                           />
-                        </TableCell>
-                        <TableCell>
-                          { session.createdAt ? new Date(session.createdAt).toLocaleDateString() : 'N/A' }
                         </TableCell>
                       </TableRow>
                     );
@@ -368,27 +337,19 @@ const AdminDashboard: React.FC = () => {
                     <TableCell>Rating</TableCell>
                     <TableCell>Review</TableCell>
                     <TableCell>Status</TableCell>
-                    <TableCell>Date</TableCell>
                     <TableCell>Actions</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   { allReviews.map((review) => {
-                    const mentor = mentors.find(
-                      (m) => m.id === review.id
-                    );
-                    const reviewer = usersList.find(
-                      (u) => u.id === review.id
-                    );
+
                     return (
                       <TableRow key={ review.id }>
                         <TableCell>
-                          { mentor
-                            ? `${mentor.firstName} ${mentor.lastName}`
-                            : "Unknown Mentor" }
+                          {/* { review.mentor.firstName } { review.mentor.lastName } */ }
                         </TableCell>
                         <TableCell>
-                          { review.rating } | { reviewer?.firstName }
+                          {/* { review.rating } | { reviewer?.firstName } */ }
                         </TableCell>
                         <TableCell
                           sx={ {
@@ -406,9 +367,6 @@ const AdminDashboard: React.FC = () => {
                             color={ review.isVisible ? "error" : "success" }
                             size="small"
                           />
-                        </TableCell>
-                        <TableCell>
-                          { review.createdAt ? new Date(review.createdAt).toLocaleDateString() : 'N/A' }
                         </TableCell>
                         <TableCell>
                           { !review.isVisible && (

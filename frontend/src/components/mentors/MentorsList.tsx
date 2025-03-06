@@ -1,6 +1,5 @@
 import React, { useState, useMemo } from "react";
 import {
-  Grid,
   Box,
   TextField,
   Typography,
@@ -12,18 +11,20 @@ import {
   SelectChangeEvent,
   Pagination,
   Stack,
+  Container,
 } from "@mui/material";
+
 import { Search as SearchIcon } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import MentorCard from "./MentorCard";
 import Loading from "@/components/common/Loading";
-import { selectMentors } from "@/store/usersSlice";
+import { selectAllMentors } from "@/store/usersSlice";
 import { RootState } from "@/store";
 
 const MENTORS_PER_PAGE = 6;
 
 const MentorsList: React.FC = () => {
-  const mentors = useSelector(selectMentors);
+  const mentors = useSelector(selectAllMentors);
   const isLoading = useSelector((state: RootState) => state.users.isLoading);
   const [searchTerm, setSearchTerm] = useState("");
   const [expertise, setExpertise] = useState("all");
@@ -50,7 +51,7 @@ const MentorsList: React.FC = () => {
   const availableExpertise = useMemo(() => {
     const skillsSet = new Set<string>();
     mentors.forEach((mentor) => {
-      mentor.expertise.forEach((skill) => skillsSet.add(skill));
+      skillsSet.add(mentor.expertise);
     });
     return Array.from(skillsSet).sort();
   }, [mentors]);
@@ -62,9 +63,7 @@ const MentorsList: React.FC = () => {
         `${mentor.firstName} ${mentor.lastName}`
           .toLowerCase()
           .includes(searchTerm.toLowerCase()) ||
-        mentor.expertise.some((skill) =>
-          skill.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
+        mentor.expertise.toLowerCase().includes(searchTerm.toLowerCase());
 
       const matchesExpertise =
         expertise === "all" || mentor.expertise.includes(expertise);
@@ -85,46 +84,44 @@ const MentorsList: React.FC = () => {
   }
 
   return (
-    <Box>
-      <Box sx={ { mb: 4 } }>
-        <Grid container spacing={ 2 } alignItems="center">
-          <Grid item xs={ 12 } md={ 6 }>
-            <TextField
-              fullWidth
-              placeholder="Search by name or expertise..."
-              value={ searchTerm }
-              onChange={ handleSearchChange }
-              InputProps={ {
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <SearchIcon />
-                  </InputAdornment>
-                ),
-              } }
-            />
-          </Grid>
-          <Grid item xs={ 12 } md={ 6 }>
-            <FormControl fullWidth>
-              <InputLabel id="expertise-filter-label">
-                Filter by Expertise
-              </InputLabel>
-              <Select
-                labelId="expertise-filter-label"
-                id="expertise-filter"
-                value={ expertise }
-                label="Filter by Expertise"
-                onChange={ handleExpertiseChange }
-              >
-                <MenuItem value="all">All Expertise</MenuItem>
-                { availableExpertise.map((skill) => (
-                  <MenuItem key={ skill } value={ skill }>
-                    { skill }
-                  </MenuItem>
-                )) }
-              </Select>
-            </FormControl>
-          </Grid>
-        </Grid>
+    <Container>
+      <Box sx={ { mb: 4, display: 'flex', flexDirection: { xs: 'column', md: 'row' }, gap: 2 } }>
+        <Box sx={ { flex: 1 } }>
+          <TextField
+            fullWidth
+            placeholder="Search by name or expertise..."
+            value={ searchTerm }
+            onChange={ handleSearchChange }
+            InputProps={ {
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            } }
+          />
+        </Box>
+        <Box sx={ { flex: 1 } }>
+          <FormControl fullWidth>
+            <InputLabel id="expertise-filter-label">
+              Filter by Expertise
+            </InputLabel>
+            <Select
+              labelId="expertise-filter-label"
+              id="expertise-filter"
+              value={ expertise }
+              label="Filter by Expertise"
+              onChange={ handleExpertiseChange }
+            >
+              <MenuItem value="all">All Expertise</MenuItem>
+              { availableExpertise.map((skill) => (
+                <MenuItem key={ skill } value={ skill }>
+                  { skill }
+                </MenuItem>
+              )) }
+            </Select>
+          </FormControl>
+        </Box>
       </Box>
 
       { filteredMentors.length === 0 ? (
@@ -143,13 +140,13 @@ const MentorsList: React.FC = () => {
             mentors
           </Typography>
 
-          <Grid container spacing={ 3 }>
+          <Box sx={ { display: 'flex', flexWrap: 'wrap', gap: 3 } }>
             { paginatedMentors.map((mentor) => (
-              <Grid item key={ mentor.id } xs={ 12 } sm={ 6 } md={ 4 }>
+              <Box key={ mentor.id } sx={ { width: { xs: '100%', sm: 'calc(50% - 12px)', md: 'calc(33.333% - 16px)' } } }>
                 <MentorCard mentor={ mentor } />
-              </Grid>
+              </Box>
             )) }
-          </Grid>
+          </Box>
 
           { pageCount > 1 && (
             <Stack alignItems="center" sx={ { mt: 4 } }>
@@ -164,7 +161,7 @@ const MentorsList: React.FC = () => {
           ) }
         </>
       ) }
-    </Box>
+    </Container>
   );
 };
 
