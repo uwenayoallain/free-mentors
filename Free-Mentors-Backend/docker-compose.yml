@@ -9,7 +9,7 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
+      - MONGO_URI=${MONGO_URI}
       - SECRET_KEY=${SECRET_KEY:-tKVT-5zPHNhP_cPCtG0DFDratu26cMPtFIeRucLKFqDzX-ErhLdvwNfEpjQjdb2ymYA}
       - DEBUG=${DEBUG:-True}
       - MONGO_DB_NAME=${MONGO_DB_NAME:-free_mentors_db}

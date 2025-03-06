@@ -31,3 +31,6 @@ class User(Document):
 
     def get_username(self):
         return self.email
+    
+class AdminCreationFlag(Document):
+    admin_created = BooleanField(default=False)
