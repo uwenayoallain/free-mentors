@@ -122,8 +122,8 @@ const ProfilePage: React.FC = () => {
             </Box>
             <Snackbar
               open={ isSubmitSuccessful }
-              autoHideDuration={ 15000 }
-              anchorOrigin={ { vertical: "bottom", horizontal: "right" } }
+              autoHideDuration={ 6000 }
+              anchorOrigin={ { vertical: "top", horizontal: "right" } }
             >
               <Alert severity="success" variant="filled">
                 Profile updated successfully

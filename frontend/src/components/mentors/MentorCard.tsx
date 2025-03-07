@@ -59,7 +59,7 @@ const MentorCard: React.FC<MentorCardProps> = ({ mentor, rating }) => {
               left: 0,
               width: "100%",
               height: "100%",
-              background: "linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.7))",
+              background: "linear-gradient(90deg, rgba(79,70,229,1) 0%, rgba(79,70,229,1) 35%, rgba(79,70,249,1) 100%)",
               opacity: 0,
               transition: "opacity 0.3s",
               "&:hover": { opacity: 1 },

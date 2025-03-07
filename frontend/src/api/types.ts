@@ -51,6 +51,16 @@ export interface Review {
   id: string;
   session: {
     id: string;
+    mentee: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
+    mentor?: {
+      id: string;
+      firstName: string;
+      lastName: string;
+    };
   };
   rating: number;
   content: string;

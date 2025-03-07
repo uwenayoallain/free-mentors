@@ -19,7 +19,7 @@ const MentorsPage: React.FC = () => {
         sx={ {
           p: 4,
           mb: 4,
-          background: "linear-gradient(to right, #1976d2, #64b5f6)",
+          background: "linear-gradient(90deg, rgba(79,70,229,1) 0%, rgba(79,70,229,1) 35%, rgba(79,70,249,1) 100%)",
         } }
       >
         <Box sx={ { color: "white", maxWidth: 800 } }>

@@ -28,6 +28,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { Mentor, Review, UserType } from "@/api/types";
 import RequestSessionForm from "@/components/sessions/RequestSessionForm";
+import { formatDistanceToNow } from "date-fns";
 
 interface MentorDetailProps {
   mentor: Mentor;
@@ -197,10 +198,25 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                           />
                           <Typography
                             variant="subtitle2"
-                            color="text.secondary"
+                            color="text"
+                            fontWeight={ 600 }
                           >
-                            Anonymous Mentee
+                            { review.session.mentee.firstName } { review.session.mentee.lastName }
                           </Typography>
+                          {
+                            review.createdAt && (
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                sx={ { ml: 1 } }
+                              >
+                                { formatDistanceToNow(new Date(review.createdAt), {
+                                  addSuffix: true,
+                                }) }
+                              </Typography>
+                            )
+                          }
+
                         </Box>
                         <Box
                           sx={ { display: "flex", alignItems: "center", mb: 2 } }

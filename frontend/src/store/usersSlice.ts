@@ -11,6 +11,7 @@ interface UsersState {
   error: ApiError | null;
   allMentors: Mentor[];
   allUsers: User[];
+  allReviews: Review[];
 }
 
 const initialState: UsersState = {
@@ -20,6 +21,7 @@ const initialState: UsersState = {
   error: null,
   allMentors: [],
   allUsers: [],
+  allReviews: [],
 };
 
 // Fetch current user
@@ -114,6 +116,21 @@ export const changeMentorStatus = createAsyncThunk<
   }
 );
 
+// Fetch All Reviews
+export const fetchAllReviews = createAsyncThunk<
+  Review[],
+  void,
+  { rejectValue: ApiError }
+>("users/getAllReviews", async (_, { rejectWithValue }) => {
+  const response = await api.getAllReviews();
+
+  if (response.error) {
+    return rejectWithValue(response.error);
+  }
+
+  return response.data!;
+});
+
 // Hide review
 export const hideReview = createAsyncThunk<
   Review,
@@ -136,6 +153,7 @@ export const selectAllUsers = (state: RootState) => state.users.allUsers;
 export const selectCurrentMentor = (state: RootState) =>
   state.users.currentMentor;
 export const selectReviews = (state: RootState) => state.users.reviews;
+export const selectAllReviews = (state: RootState) => state.users.allReviews;
 
 const usersSlice = createSlice({
   name: "users",
@@ -167,49 +185,68 @@ const usersSlice = createSlice({
       });
 
     // Fetch All Mentors
+    builder.addCase(fetchAllMentors.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+
+    builder.addCase(fetchAllMentors.fulfilled, (state, action) => {
+      state.allMentors = action.payload; // Update allMentors in state
+      state.isLoading = false;
+    });
+    builder.addCase(fetchAllMentors.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload || {
+        message: "Failed to fetch all mentors",
+      };
+    });
+
+    // Fetch Specific Mentor
     builder
-      .addCase(fetchAllMentors.pending, (state) => {
+      .addCase(fetchMentor.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(fetchAllMentors.fulfilled, (state, action) => {
-        state.allMentors = action.payload; // Update allMentors in state
+      .addCase(fetchMentor.fulfilled, (state, action) => {
         state.isLoading = false;
+        state.currentMentor = action.payload;
       })
-      .addCase(fetchAllMentors.rejected, (state, action) => {
+      .addCase(fetchMentor.rejected, (state, action) => {
         state.isLoading = false;
-        state.error = action.payload || {
-          message: "Failed to fetch all mentors",
-        };
+        state.error = action.payload || { message: "Failed to fetch mentor" };
       });
 
-    // Fetch Specific Mentor
-    builder.addCase(fetchMentor.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchMentor.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.currentMentor = action.payload;
-    });
-    builder.addCase(fetchMentor.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload || { message: "Failed to fetch mentor" };
-    });
-
     // Fetch Mentor Reviews
-    builder.addCase(fetchMentorReviews.pending, (state) => {
-      state.isLoading = true;
-      state.error = null;
-    });
-    builder.addCase(fetchMentorReviews.fulfilled, (state, action) => {
-      state.isLoading = false;
-      state.reviews = action.payload;
-    });
-    builder.addCase(fetchMentorReviews.rejected, (state, action) => {
-      state.isLoading = false;
-      state.error = action.payload || { message: "Failed to fetch reviews" };
-    });
+    builder
+      .addCase(fetchMentorReviews.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchMentorReviews.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.reviews = action.payload;
+      })
+      .addCase(fetchMentorReviews.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || { message: "Failed to fetch reviews" };
+      });
+
+    // Fetch All Reviews
+    builder
+      .addCase(fetchAllReviews.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(fetchAllReviews.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.allReviews = action.payload;
+      })
+      .addCase(fetchAllReviews.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload || {
+          message: "Failed to fetch all reviews",
+        };
+      });
 
     // Hide Review
     builder.addCase(hideReview.fulfilled, (state, action) => {
@@ -224,6 +261,7 @@ const usersSlice = createSlice({
       state.allMentors = [];
       state.allUsers = [];
       state.error = null;
+      state.allReviews = [];
       state.isLoading = false;
     });
   },

@@ -21,6 +21,9 @@ import {
   Stack,
   TextField,
   InputAdornment,
+  Rating,
+  Snackbar,
+  Alert,
 } from "@mui/material";
 import {
   Search as SearchIcon,
@@ -33,18 +36,19 @@ import Layout from "@/components/common/Layout";
 import Loading from "@/components/common/Loading";
 import { UserType, User, Review, SessionStatus } from "@/api/types";
 import {
-  selectReviews,
   changeMentorStatus,
   hideReview,
   fetchAllUsers,
   selectAllUsers,
+  fetchAllReviews,
+  selectAllReviews,
 } from "@/store/usersSlice";
 import { useNavigate } from "react-router-dom";
 
 const AdminDashboard: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
 
-  const reviews = useSelector(selectReviews);
+  const reviews = useSelector(selectAllReviews);
   const isLoading = useSelector((state: RootState) => state.users.isLoading);
   const usersList = useSelector(selectAllUsers);
 
@@ -57,9 +61,21 @@ const AdminDashboard: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [action, setAction] = useState<"promote" | "demote" | null>(null);
 
+  // New state for hide review confirmation dialog
+  const [hideReviewDialogOpen, setHideReviewDialogOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+
+  // New state for toast notifications
+  const [toast, setToast] = useState({
+    open: false,
+    message: "",
+    severity: "info" as "error" | "info" | "success" | "warning",
+  });
+
   useEffect(() => {
     dispatch(fetchAllUsers());
     dispatch(fetchSessions());
+    dispatch(fetchAllReviews());
   }, [dispatch]);
 
   const handleTabChange = (_event: React.SyntheticEvent, newValue: number) => {
@@ -82,6 +98,30 @@ const AdminDashboard: React.FC = () => {
     setAction(null);
   };
 
+  // New handlers for hide review dialog
+  const handleOpenHideReviewDialog = (review: Review) => {
+    setSelectedReview(review);
+    setHideReviewDialogOpen(true);
+  };
+
+  const handleCloseHideReviewDialog = () => {
+    setHideReviewDialogOpen(false);
+    setSelectedReview(null);
+  };
+
+  // Toast handlers
+  const handleCloseToast = () => {
+    setToast({ ...toast, open: false });
+  };
+
+  const showToast = (message: string, severity: "error" | "info" | "success" | "warning") => {
+    setToast({
+      open: true,
+      message,
+      severity,
+    });
+  };
+
   const handleChangeMentorStatus = async () => {
     if (selectedUser && action) {
       try {
@@ -92,17 +132,28 @@ const AdminDashboard: React.FC = () => {
           })
         ).unwrap();
         handleCloseDialog();
+        showToast(
+          `${selectedUser.firstName} ${selectedUser.lastName} has been ${action === "promote" ? "promoted to mentor" : "demoted from mentor"
+          }`,
+          "success"
+        );
       } catch (error) {
         console.error("Failed to change mentor status", error);
+        showToast("Failed to change mentor status", "error");
       }
     }
   };
 
-  const handleHideReview = async (reviewId: string) => {
-    try {
-      await dispatch(hideReview(reviewId)).unwrap();
-    } catch (error) {
-      console.error("Failed to hide review", error);
+  const handleHideReview = async () => {
+    if (selectedReview) {
+      try {
+        await dispatch(hideReview(selectedReview.id)).unwrap();
+        handleCloseHideReviewDialog();
+        showToast("Review has been hidden successfully", "success");
+      } catch (error) {
+        console.error("Failed to hide review", error);
+        showToast("Failed to hide review", "error");
+      }
     }
   };
 
@@ -134,7 +185,7 @@ const AdminDashboard: React.FC = () => {
         sx={ {
           p: 4,
           mb: 4,
-          background: "linear-gradient(to right, #1976d2, #64b5f6)",
+          background: "linear-gradient(90deg, rgba(79,70,229,1) 0%, rgba(79,70,229,1) 35%, rgba(79,70,249,1) 100%)",
         } }
       >
         <Box sx={ { color: "white" } }>
@@ -216,30 +267,23 @@ const AdminDashboard: React.FC = () => {
                         />
                       </TableCell>
                       <TableCell>
-                        { user.userType !== UserType.ADMIN && (
+                        { user.userType == UserType.MENTEE && (
                           <Button
                             variant="outlined"
                             size="small"
-                            color={
-                              user.userType === UserType.MENTOR ? "error" : "primary"
-                            }
+                            color={ "primary" }
                             startIcon={
-                              user.userType === UserType.MENTOR ? null : (
-                                <PersonAddIcon />
-                              )
+                              <PersonAddIcon />
                             }
                             onClick={ () =>
                               handleOpenDialog(
                                 user,
-                                user.userType === UserType.MENTOR
-                                  ? "demote"
-                                  : "promote"
+
+                                "promote"
                               )
                             }
                           >
-                            { user.userType === UserType.MENTOR
-                              ? "Remove Mentor Status"
-                              : "Make Mentor" }
+                            { user.userType === UserType.MENTEE && "Make Mentor" }
                           </Button>
                         ) }
                       </TableCell>
@@ -279,15 +323,14 @@ const AdminDashboard: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   { sessions.map((session) => {
-
                     return (
                       <TableRow key={ session.id }>
                         <TableCell>{ session.topic }</TableCell>
                         <TableCell>
-                          { session.mentor.firstName } ${ session.mentor.lastName }
+                          { session.mentor.firstName } { session.mentor.lastName }
                         </TableCell>
                         <TableCell>
-                          { session.mentee.firstName } ${ session.mentee.lastName }
+                          { session.mentee.firstName } { session.mentee.lastName }
                         </TableCell>
                         <TableCell>
                           <Chip
@@ -334,6 +377,7 @@ const AdminDashboard: React.FC = () => {
                 <TableHead>
                   <TableRow>
                     <TableCell>Mentor</TableCell>
+                    <TableCell>Mentee</TableCell>
                     <TableCell>Rating</TableCell>
                     <TableCell>Review</TableCell>
                     <TableCell>Status</TableCell>
@@ -342,14 +386,21 @@ const AdminDashboard: React.FC = () => {
                 </TableHead>
                 <TableBody>
                   { allReviews.map((review) => {
-
                     return (
                       <TableRow key={ review.id }>
                         <TableCell>
-                          {/* { review.mentor.firstName } { review.mentor.lastName } */ }
+                          { review.session.mentor?.firstName } { review.session.mentor?.lastName }
                         </TableCell>
                         <TableCell>
-                          {/* { review.rating } | { reviewer?.firstName } */ }
+                          { review.session.mentee.firstName } { review.session.mentee.lastName }
+                        </TableCell>
+                        <TableCell>
+                          <Rating
+                            value={ review.rating }
+                            readOnly
+                            size="small"
+                            precision={ 0.5 }
+                          />
                         </TableCell>
                         <TableCell
                           sx={ {
@@ -363,18 +414,18 @@ const AdminDashboard: React.FC = () => {
                         </TableCell>
                         <TableCell>
                           <Chip
-                            label={ review.isVisible ? "Hidden" : "Visible" }
-                            color={ review.isVisible ? "error" : "success" }
+                            label={ review.isVisible ? "Visible" : "Hidden" }
+                            color={ review.isVisible ? "success" : "error" }
                             size="small"
                           />
                         </TableCell>
                         <TableCell>
-                          { !review.isVisible && (
+                          { review.isVisible && (
                             <Button
                               variant="outlined"
                               size="small"
                               color="error"
-                              onClick={ () => handleHideReview(review.id) }
+                              onClick={ () => handleOpenHideReviewDialog(review) }
                             >
                               Hide Review
                             </Button>
@@ -422,6 +473,44 @@ const AdminDashboard: React.FC = () => {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Hide Review Confirmation Dialog */ }
+      <Dialog open={ hideReviewDialogOpen } onClose={ handleCloseHideReviewDialog }>
+        <DialogTitle>Hide Review</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to hide this review?
+            Hidden reviews will not be visible to users on the platform.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={ handleCloseHideReviewDialog }>Cancel</Button>
+          <Button
+            onClick={ handleHideReview }
+            color="error"
+            variant="contained"
+          >
+            Hide Review
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Toast Notification */ }
+      <Snackbar
+        open={ toast.open }
+        autoHideDuration={ 6000 }
+        onClose={ handleCloseToast }
+        anchorOrigin={ { vertical: 'top', horizontal: 'right' } }
+      >
+        <Alert
+          onClose={ handleCloseToast }
+          severity={ toast.severity }
+          variant="filled"
+          sx={ { width: '100%' } }
+        >
+          { toast.message }
+        </Alert>
+      </Snackbar>
     </Layout>
   );
 };

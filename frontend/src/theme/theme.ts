@@ -9,7 +9,7 @@ const theme = createTheme({
       contrastText: "#ffffff",
     },
     secondary: {
-      main: "#f97316", // Vibrant orange that creates beautiful contrast
+      main: "#f97316",
       light: "#fb923c",
       dark: "#ea580c",
       contrastText: "#ffffff",
@@ -44,7 +44,7 @@ const theme = createTheme({
     },
     text: {
       primary: "#334155",
-      secondary: "#64748b", // Keeping this slate for text - works well with both primary/secondary
+      secondary: "#64748b",
     },
     divider: "rgba(100, 116, 139, 0.12)",
   },
@@ -114,11 +114,11 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           borderRadius: 16,
-          boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
+          boxShadow: "0 0px 0px rgba(0,0,0,0.01)",
           transition: "transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out",
           "&:hover": {
-            transform: "translateY(-4px)",
-            boxShadow: "0 12px 28px rgba(0,0,0,0.1)",
+            transform: "translateY(-1px)",
+            boxShadow: "0 0px 0px rgba(0,0,0,0.1)",
           },
         },
       },
@@ -127,22 +127,6 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           boxShadow: "0 2px 12px rgba(0,0,0,0.08)",
-        },
-      },
-    },
-    MuiTextField: {
-      styleOverrides: {
-        root: {
-          "& .MuiOutlinedInput-root": {
-            borderRadius: 8,
-          },
-        },
-      },
-    },
-    MuiPaper: {
-      styleOverrides: {
-        elevation1: {
-          boxShadow: "0 3px 10px rgba(0,0,0,0.06)",
         },
       },
     },

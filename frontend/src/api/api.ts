@@ -641,11 +641,22 @@ export const api = {
           id
           session {
             id
+            mentee {
+              id
+              firstName
+              lastName
+            }
+            mentor {
+              id
+              firstName
+              lastName
+            }
           }
           rating
           content
           isVisible
           createdAt
+          updatedAt
         }
       }
     `;
@@ -667,9 +678,55 @@ export const api = {
     }
   },
 
+  getAllReviews: async (): Promise<ApiResponse<Review[]>> => {
+    const query = gql`
+      query {
+        allReviews {
+          content
+          createdAt
+          id
+          isVisible
+          rating
+          session {
+            id
+            mentee {
+              firstName
+              lastName
+              id
+            }
+            mentor {
+              id
+              firstName
+              lastName
+            }
+          }
+        }
+      }
+    `;
+    try {
+      interface AllReviewsResponse {
+        allReviews: Review[];
+      }
+      const { allReviews } = await graphQLClient.request<AllReviewsResponse>(
+        query
+      );
+      return { data: allReviews };
+    } catch (error) {
+      return {
+        error: {
+          message: error instanceof Error ? error.message : String(error),
+        },
+      };
+    }
+  },
+
   createReview: async (input: ReviewInput): Promise<ApiResponse<Review>> => {
     const mutation = gql`
-      mutation CreateReview($sessionId: ID!, $rating: Int!, $content: String!) {
+      mutation CreateReview(
+        $sessionId: String!
+        $rating: Int!
+        $content: String!
+      ) {
         createReview(
           sessionId: $sessionId
           rating: $rating

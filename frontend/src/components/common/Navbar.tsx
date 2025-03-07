@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -29,7 +29,7 @@ import {
 import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { logout } from "@/store/authSlice";
+import { getProfile, logout } from "@/store/authSlice";
 import { AppDispatch } from "@/store";
 import { UserType } from "@/api/types";
 
@@ -45,6 +45,9 @@ const Navbar = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
+  useEffect(() => {
+    dispatch(getProfile());
+  }, [dispatch])
   const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
   };

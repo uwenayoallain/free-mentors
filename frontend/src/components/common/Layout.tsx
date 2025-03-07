@@ -19,7 +19,7 @@ const Layout: React.FC<LayoutProps> = ({ children, maxWidth = "lg" }) => {
   const userError = useSelector((state: RootState) => state.users.error);
   const sessionError = useSelector((state: RootState) => state.sessions.error);
   const successMessage = useSelector(
-    (state: RootState) => state.sessions.successMessage,
+    (state: RootState) => state.sessions.successMessage
   );
 
   const handleCloseError = () => {
@@ -33,12 +33,12 @@ const Layout: React.FC<LayoutProps> = ({ children, maxWidth = "lg" }) => {
   };
 
   const errorMessage = extractErrorMessage(
-    authError?.message || userError?.message || sessionError?.message);
+    authError?.message || userError?.message || sessionError?.message
+  );
 
   return (
     <Box sx={ { display: "flex", flexDirection: "column", minHeight: "100vh" } }>
       <Navbar />
-
       <Container
         component="main"
         maxWidth={ maxWidth }
@@ -51,29 +51,26 @@ const Layout: React.FC<LayoutProps> = ({ children, maxWidth = "lg" }) => {
       >
         { children }
       </Container>
-
       <Snackbar
         open={ !!errorMessage }
         autoHideDuration={ 6000 }
         onClose={ handleCloseError }
-        anchorOrigin={ { vertical: "bottom", horizontal: "right" } }
+        anchorOrigin={ { vertical: "top", horizontal: "right" } }
       >
         <Alert onClose={ handleCloseError } severity="error" variant="filled">
           { errorMessage }
         </Alert>
       </Snackbar>
-
       <Snackbar
         open={ !!successMessage }
         autoHideDuration={ 6000 }
         onClose={ handleCloseSuccess }
-        anchorOrigin={ { vertical: "bottom", horizontal: "right" } }
+        anchorOrigin={ { vertical: "top", horizontal: "right" } }
       >
         <Alert onClose={ handleCloseSuccess } severity="success" variant="filled">
           { successMessage }
         </Alert>
       </Snackbar>
-
       <Box
         component="footer"
         sx={ {
