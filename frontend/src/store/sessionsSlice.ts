@@ -1,18 +1,12 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  createSelector,
-} from "@reduxjs/toolkit";
-import { api } from "@/api/api"; // Import your actual API
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { api } from "@/api/api";
 import {
   ApiError,
-  Mentor,
   Review,
   ReviewInput,
   Session,
   SessionInput,
   SessionStatus,
-  User,
 } from "@/api/types";
 import { RootState } from "@/store";
 
@@ -91,26 +85,7 @@ export const createReview = createAsyncThunk<
 
 // Create selectors
 export const selectSessions = (state: RootState) => state.sessions.sessions;
-export const selectUsers = (state: RootState) => state.users.list;
 export const selectCurrentUser = (state: RootState) => state.auth.user;
-
-// Compose selector for session details
-export const getSessionWithDetails = createSelector(
-  [selectSessions, selectUsers, selectCurrentUser],
-  (sessions, users, currentUser) => {
-    return sessions.map((session: Session) => {
-      const mentor = users.find((user: User) => user.id === session.mentor.id);
-      const user = users.find((user: User) => user.id === session.mentee.id);
-
-      return {
-        ...session,
-        mentor: (mentor as Mentor) ?? null,
-        user,
-        isOwner: currentUser?.id === session.mentee.id,
-      };
-    });
-  }
-);
 
 const sessionsSlice = createSlice({
   name: "sessions",

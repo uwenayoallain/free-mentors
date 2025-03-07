@@ -56,7 +56,7 @@ const Layout: React.FC<LayoutProps> = ({ children, maxWidth = "lg" }) => {
         open={ !!errorMessage }
         autoHideDuration={ 6000 }
         onClose={ handleCloseError }
-        anchorOrigin={ { vertical: "bottom", horizontal: "left" } }
+        anchorOrigin={ { vertical: "bottom", horizontal: "right" } }
       >
         <Alert onClose={ handleCloseError } severity="error" variant="filled">
           { errorMessage }
