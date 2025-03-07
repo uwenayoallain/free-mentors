@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-WORKDIR /app
+WORKDIR /app/frontend
 
 # Install PNPM
 RUN npm install -g pnpm

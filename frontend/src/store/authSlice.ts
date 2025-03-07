@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { mockApi } from "@/api/mockApi";
+import { api } from "@/api/api";
 import { ApiError, LoginInput, SignupInput, User } from "@/api/types";
 
 interface AuthState {
@@ -11,9 +11,9 @@ interface AuthState {
 }
 
 const initialState: AuthState = {
-  user: mockApi.getCurrentUser(),
-  token: mockApi.getToken(),
-  isAuthenticated: !!mockApi.getCurrentUser(),
+  user: null, // Initialize user and token to null
+  token: localStorage.getItem("token"), // Get token from local storage
+  isAuthenticated: !!localStorage.getItem("token"), // Check if token exists
   isLoading: false,
   error: null,
 };
@@ -23,7 +23,7 @@ export const signup = createAsyncThunk<
   SignupInput,
   { rejectValue: ApiError }
 >("auth/signup", async (signupData, { rejectWithValue }) => {
-  const response = await mockApi.signup(signupData);
+  const response = await api.signup(signupData);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -40,7 +40,7 @@ export const login = createAsyncThunk<
   LoginInput,
   { rejectValue: ApiError }
 >("auth/login", async (loginData, { rejectWithValue }) => {
-  const response = await mockApi.login(loginData);
+  const response = await api.login(loginData);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -52,17 +52,39 @@ export const login = createAsyncThunk<
   };
 });
 
-export const logout = createAsyncThunk("auth/logout", async () => {
-  await mockApi.logout();
-  return null;
+export const updateProfile = createAsyncThunk<
+  User,
+  Partial<User>,
+  { rejectValue: ApiError }
+>("auth/updateProfile", async (profileData, { rejectWithValue }) => {
+  const response = await api.updateUser(profileData);
+
+  if (response.error) {
+    return rejectWithValue(response.error);
+  }
+
+  return response.data!;
 });
+
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (_, { rejectWithValue }) => {
+    const response = await api.logout();
+
+    if (response.error) {
+      return rejectWithValue(response.error);
+    }
+
+    return null;
+  }
+);
 
 export const getProfile = createAsyncThunk<
   User,
   void,
   { rejectValue: ApiError }
 >("auth/getProfile", async (_, { rejectWithValue }) => {
-  const response = await mockApi.getProfile();
+  const response = await api.getProfile();
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -90,6 +112,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
+      localStorage.setItem("token", action.payload.token);
     });
     builder.addCase(signup.rejected, (state, action) => {
       state.isLoading = false;
@@ -106,6 +129,7 @@ const authSlice = createSlice({
       state.isAuthenticated = true;
       state.user = action.payload.user;
       state.token = action.payload.token;
+      localStorage.setItem("token", action.payload.token);
     });
     builder.addCase(login.rejected, (state, action) => {
       state.isLoading = false;
@@ -121,6 +145,8 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+      state.error = null;
+      localStorage.removeItem("token");
     });
 
     // Get Profile
@@ -135,6 +161,20 @@ const authSlice = createSlice({
     builder.addCase(getProfile.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload || { message: "Failed to get profile" };
+    });
+
+    // Update Profile
+    builder.addCase(updateProfile.pending, (state) => {
+      state.isLoading = true;
+      state.error = null;
+    });
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
+      state.isLoading = false;
+      state.user = action.payload;
+    });
+    builder.addCase(updateProfile.rejected, (state, action) => {
+      state.isLoading = false;
+      state.error = action.payload || { message: "Failed to update profile" };
     });
   },
 });

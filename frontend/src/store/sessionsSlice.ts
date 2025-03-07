@@ -1,20 +1,15 @@
-import {
-  createSlice,
-  createAsyncThunk,
-  createSelector,
-} from "@reduxjs/toolkit";
-import { mockApi } from "@/api/mockApi";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { api } from "@/api/api";
 import {
   ApiError,
-  Mentor,
   Review,
   ReviewInput,
   Session,
   SessionInput,
   SessionStatus,
-  User,
 } from "@/api/types";
 import { RootState } from "@/store";
+import { logout } from "./authSlice";
 
 interface SessionsState {
   sessions: Session[];
@@ -35,7 +30,7 @@ export const fetchSessions = createAsyncThunk<
   void,
   { rejectValue: ApiError }
 >("sessions/fetchSessions", async (_, { rejectWithValue }) => {
-  const response = await mockApi.getSessions();
+  const response = await api.getSessions();
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -49,7 +44,7 @@ export const createSession = createAsyncThunk<
   SessionInput,
   { rejectValue: ApiError }
 >("sessions/createSession", async (sessionData, { rejectWithValue }) => {
-  const response = await mockApi.createSession(sessionData);
+  const response = await api.createSession(sessionData);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -65,7 +60,7 @@ export const updateSessionStatus = createAsyncThunk<
 >(
   "sessions/updateSessionStatus",
   async ({ sessionId, status }, { rejectWithValue }) => {
-    const response = await mockApi.updateSessionStatus(sessionId, status);
+    const response = await api.updateSessionStatus(sessionId, status);
 
     if (response.error) {
       return rejectWithValue(response.error);
@@ -80,7 +75,7 @@ export const createReview = createAsyncThunk<
   ReviewInput,
   { rejectValue: ApiError }
 >("sessions/createReview", async (reviewData, { rejectWithValue }) => {
-  const response = await mockApi.createReview(reviewData);
+  const response = await api.createReview(reviewData);
 
   if (response.error) {
     return rejectWithValue(response.error);
@@ -91,26 +86,7 @@ export const createReview = createAsyncThunk<
 
 // Create selectors
 export const selectSessions = (state: RootState) => state.sessions.sessions;
-export const selectUsers = (state: RootState) => state.users.list;
 export const selectCurrentUser = (state: RootState) => state.auth.user;
-
-// Compose selector for session details
-export const getSessionWithDetails = createSelector(
-  [selectSessions, selectUsers, selectCurrentUser],
-  (sessions, users, currentUser) => {
-    return sessions.map((session: Session) => {
-      const mentor = users.find((user: User) => user.id === session.mentorId);
-      const user = users.find((user: User) => user.id === session.userId);
-
-      return {
-        ...session,
-        mentor: (mentor as Mentor) ?? null,
-        user,
-        isOwner: currentUser?.id === session.userId,
-      };
-    });
-  }
-);
 
 const sessionsSlice = createSlice({
   name: "sessions",
@@ -169,10 +145,8 @@ const sessionsSlice = createSlice({
         state.sessions[index] = action.payload;
       }
 
-      const statusText =
-        action.payload.status === SessionStatus.ACCEPTED
-          ? "accepted"
-          : "declined";
+      const statusText = action.payload.status;
+
       state.successMessage = `Session ${statusText} successfully!`;
     });
     builder.addCase(updateSessionStatus.rejected, (state, action) => {
@@ -195,6 +169,12 @@ const sessionsSlice = createSlice({
     builder.addCase(createReview.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload || { message: "Failed to submit review" };
+    });
+    builder.addCase(logout.fulfilled, (state) => {
+      state.sessions = [];
+      state.successMessage = null;
+      state.isLoading = false;
+      state.error = null;
     });
   },
 });

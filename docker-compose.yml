@@ -1,7 +1,37 @@
 services:
   frontend:
-    build: 
+    build:
       context: ./frontend
+    volumes:
+      - ./frontend:/app/frontend
     ports:
       - "3000:3000"
-# Other services...
+  backend:
+    build:
+      context: ./backend
+      args:
+        DEV: ${DEV:-false}
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_URI=mongodb://${MONGO_USERNAME}:${MONGO_PASSWORD}@mongodb:27017/${MONGO_DB_NAME}?authSource=admin
+      - SECRET_KEY=${SECRET_KEY:-tKVT-5zPHNhP_cPCtG0DFDratu26cMPtFIeRucLKFqDzX-ErhLdvwNfEpjQjdb2ymYA}
+      - DEBUG=${DEBUG:-True}
+      - MONGO_DB_NAME=${MONGO_DB_NAME:-free_mentors_db}
+    depends_on:
+      - mongodb
+    volumes:
+      - ./backend:/app/backend
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    volumes:
+      - mongodb_data:/data/db
+
+volumes:
+  mongodb_data:

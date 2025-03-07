@@ -15,7 +15,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { signup } from "@/store/authSlice";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 
 const signupSchema = z
   .object({
@@ -24,6 +24,10 @@ const signupSchema = z
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
+    address: z.string().min(5, "Address must be at least 5 characters"),
+    bio: z.string().optional(),
+    occupation: z.string().optional(),
+    expertise: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -35,7 +39,7 @@ type SignupFormValues = z.infer<typeof signupSchema>;
 const SignupForm: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { isLoading } = useSelector((state: RootState) => state.auth);
-
+  const navigate = useNavigate()
   const {
     register,
     handleSubmit,
@@ -47,20 +51,28 @@ const SignupForm: React.FC = () => {
 
   const onSubmit = async (data: SignupFormValues) => {
     try {
-      const { ...signupData } = data;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { confirmPassword, ...signupData } = data;
       await dispatch(signup(signupData)).unwrap();
     } catch (error: unknown) {
-      const apiError = error as { errors?: Record<string, string | string[]> };
-      if (apiError.errors) {
-        Object.entries(apiError.errors).forEach(([field, messages]) => {
-          setError(field as keyof SignupFormValues, {
-            type: "manual",
-            message: Array.isArray(messages)
-              ? messages[0]
-              : (messages as string),
-          });
-        });
+      const apiError = error as {
+        error?: { errors?: Record<string, string | string[]> };
+      };
+      if (apiError.error?.errors) {
+        Object.entries(apiError.error.errors).forEach(
+          ([field, messages]) => {
+            setError(field as keyof SignupFormValues, {
+              type: "manual",
+              message: Array.isArray(messages)
+                ? messages[0]
+                : (messages as string),
+            });
+          }
+        );
       }
+    }
+    finally {
+      navigate('/auth/login')
     }
   };
 
@@ -142,6 +154,39 @@ const SignupForm: React.FC = () => {
             { ...register("confirmPassword") }
             error={ !!errors.confirmPassword }
             helperText={ errors.confirmPassword?.message }
+          />
+          <TextField
+            required
+            fullWidth
+            id="address"
+            label="Address"
+            { ...register("address") }
+            error={ !!errors.address }
+            helperText={ errors.address?.message }
+          />
+          <TextField
+            fullWidth
+            id="bio"
+            label="Bio"
+            { ...register("bio") }
+            error={ !!errors.bio }
+            helperText={ errors.bio?.message }
+          />
+          <TextField
+            fullWidth
+            id="occupation"
+            label="Occupation"
+            { ...register("occupation") }
+            error={ !!errors.occupation }
+            helperText={ errors.occupation?.message }
+          />
+          <TextField
+            fullWidth
+            id="expertise"
+            label="Expertise"
+            { ...register("expertise") }
+            error={ !!errors.expertise }
+            helperText={ errors.expertise?.message }
           />
         </Stack>
 

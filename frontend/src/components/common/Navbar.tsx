@@ -31,7 +31,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { logout } from "@/store/authSlice";
 import { AppDispatch } from "@/store";
-import { UserRole } from "@/api/types";
+import { UserType } from "@/api/types";
 
 const Navbar = () => {
   const theme = useTheme();
@@ -73,7 +73,7 @@ const Navbar = () => {
     { title: "My Sessions", path: "/sessions", icon: <EventNoteIcon /> },
   ];
 
-  if (user?.role === UserRole.ADMIN) {
+  if (user?.userType === UserType.ADMIN) {
     authLinks.push({
       title: "Dashboard",
       path: "/admin",
@@ -223,7 +223,7 @@ const Navbar = () => {
                     My Sessions
                   </MenuItem>
 
-                  { user?.role === UserRole.ADMIN && (
+                  { user?.userType === UserType.ADMIN && (
                     <MenuItem
                       component={ RouterLink }
                       to="/admin"

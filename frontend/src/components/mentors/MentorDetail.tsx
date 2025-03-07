@@ -26,7 +26,7 @@ import {
 } from "@mui/icons-material";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store";
-import { Mentor, Review, UserRole } from "@/api/types";
+import { Mentor, Review, UserType } from "@/api/types";
 import RequestSessionForm from "@/components/sessions/RequestSessionForm";
 
 interface MentorDetailProps {
@@ -68,7 +68,7 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                 <Avatar
                   src={
                     mentor.profilePicture ||
-                    `https://i.pravatar.cc/300?u=${mentor.id}`
+                    `https://ui-avatars.com/api/?name=${mentor.firstName}+${mentor.lastName}&background=random`
                   }
                   alt={ `${mentor.firstName} ${mentor.lastName}` }
                   sx={ { width: 120, height: 120, mb: 2 } }
@@ -78,18 +78,11 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                 </Typography>
                 <Box sx={ { display: "flex", alignItems: "center", mb: 1 } }>
                   <Rating
-                    value={ mentor.rating }
+                    value={ Math.floor(Math.random() * 3 + 2) }
                     precision={ 0.5 }
                     readOnly
                     size="small"
                   />
-                  <Typography
-                    variant="body2"
-                    color="text.secondary"
-                    sx={ { ml: 1 } }
-                  >
-                    ({ mentor.totalReviews } reviews)
-                  </Typography>
                 </Box>
               </Box>
 
@@ -100,14 +93,12 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                   Area of Expertise
                 </Typography>
                 <Box sx={ { display: "flex", flexWrap: "wrap", gap: 1 } }>
-                  { mentor.expertise.map((skill, index) => (
-                    <Chip
-                      key={ index }
-                      label={ skill }
-                      size="small"
-                      color="primary"
-                    />
-                  )) }
+                  <Chip
+                    key={ mentor.id }
+                    label={ mentor.expertise }
+                    size="small"
+                    color="primary"
+                  />
                 </Box>
               </Box>
 
@@ -122,12 +113,10 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                   } }
                 >
                   <WorkIcon fontSize="small" sx={ { mr: 1 } } />
-                  Experience
+                  Occupation
                 </Typography>
                 <Typography variant="body2">
-                  { mentor.yearsOfExperience }{ " " }
-                  { mentor.yearsOfExperience === 1 ? "year" : "years" } of
-                  experience
+                  { mentor.occupation || "No occupation provided." }
                 </Typography>
               </Box>
 
@@ -142,14 +131,14 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                   } }
                 >
                   <TimeIcon fontSize="small" sx={ { mr: 1 } } />
-                  Available Days
+                  Availability
                 </Typography>
                 <Typography variant="body2">
-                  { mentor.availableDays.join(", ") }
+                  { "Weekdays, 9:00 AM - 5:00 PM" }
                 </Typography>
               </Box>
 
-              { isAuthenticated && user?.role !== UserRole.MENTOR && (
+              { isAuthenticated && user?.userType !== UserType.MENTOR && (
                 <Button
                   variant="contained"
                   color="primary"
@@ -222,16 +211,9 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
                             readOnly
                             size="small"
                           />
-                          <Typography
-                            variant="caption"
-                            color="text.secondary"
-                            sx={ { ml: 1 } }
-                          >
-                            { new Date(review.createdAt).toLocaleDateString() }
-                          </Typography>
                         </Box>
                         <Typography variant="body2">
-                          { review.comment }
+                          { review.content }
                         </Typography>
                       </CardContent>
                     </Card>
@@ -250,7 +232,7 @@ const MentorDetail: React.FC<MentorDetailProps> = ({ mentor, reviews }) => {
         maxWidth="sm"
         fullScreen={ isMobile }
       >
-        <DialogTitle>Request a Mentorship Session</DialogTitle>
+        <DialogTitle fontWeight={ 650 } fontSize={ 24 } margin={ 1 }>Request a Mentorship Session</DialogTitle>
         <DialogContent dividers>
           <RequestSessionForm
             mentorId={ mentor.id }

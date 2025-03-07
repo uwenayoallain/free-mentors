@@ -6,24 +6,21 @@ import {
   CircularProgress,
   FormHelperText,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
 import { createSession } from "@/store/sessionsSlice";
-import { addDays } from "date-fns";
 
 const sessionSchema = z.object({
-  title: z.string().min(5, "Title must be at least 5 characters"),
-  description: z
+  topic: z.string().min(5, "Topic must be at least 5 characters"),
+  questions: z
     .string()
     .min(
       20,
-      "Please provide a more detailed description (at least 20 characters)",
+      "Please provide a more detailed description of your questions (at least 20 characters)",
     ),
-  scheduledDate: z.date().optional(),
 });
 
 type SessionFormValues = z.infer<typeof sessionSchema>;
@@ -43,15 +40,13 @@ const RequestSessionForm: React.FC<RequestSessionFormProps> = ({
   const {
     register,
     handleSubmit,
-    control,
     formState: { errors },
     reset,
   } = useForm<SessionFormValues>({
     resolver: zodResolver(sessionSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      scheduledDate: undefined,
+      topic: "",
+      questions: "",
     },
   });
 
@@ -60,9 +55,8 @@ const RequestSessionForm: React.FC<RequestSessionFormProps> = ({
       await dispatch(
         createSession({
           mentorId,
-          title: data.title,
-          description: data.description,
-          scheduledDate: data.scheduledDate?.toISOString(),
+          topic: data.topic,
+          questions: data.questions,
         }),
       ).unwrap();
 
@@ -82,12 +76,12 @@ const RequestSessionForm: React.FC<RequestSessionFormProps> = ({
         required
         fullWidth
         id="title"
-        label="Session Title"
+        label="Session Topic"
         placeholder="e.g., Career Guidance in Web Development"
         autoFocus
-        { ...register("title") }
-        error={ !!errors.title }
-        helperText={ errors.title?.message }
+        { ...register("topic") }
+        error={ !!errors.topic }
+        helperText={ errors.topic?.message }
       />
 
       <TextField
@@ -95,38 +89,15 @@ const RequestSessionForm: React.FC<RequestSessionFormProps> = ({
         required
         fullWidth
         id="description"
-        label="Description"
+        label="Questions"
         placeholder="Describe what you'd like to discuss in this mentorship session"
         multiline
         minRows={ 4 }
-        { ...register("description") }
-        error={ !!errors.description }
-        helperText={ errors.description?.message }
+        { ...register("questions") }
+        error={ !!errors.questions }
+        helperText={ errors.questions?.message }
       />
 
-      <Box sx={ { mt: 2 } }>
-        <Controller
-          name="scheduledDate"
-          control={ control }
-          render={ ({ field }) => (
-            <DatePicker
-              label="Preferred Date (Optional)"
-              value={ field.value }
-              onChange={ (newValue) => field.onChange(newValue) }
-              minDate={ addDays(new Date(), 1) }
-              maxDate={ addDays(new Date(), 30) }
-              slotProps={ {
-                textField: {
-                  fullWidth: true,
-                  margin: "normal",
-                  helperText:
-                    "You can select a preferred date or leave it blank",
-                },
-              } }
-            />
-          ) }
-        />
-      </Box>
 
       <FormHelperText>
         Your session request will be sent to the mentor, who can accept or

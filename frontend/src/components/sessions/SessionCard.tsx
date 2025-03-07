@@ -21,11 +21,11 @@ import {
   Check as CheckIcon,
   Close as CloseIcon,
   Star as StarIcon,
-  CalendarToday as CalendarIcon,
+  Done as DoneIcon,
 } from "@mui/icons-material";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store";
-import { Session, SessionStatus, UserRole } from "@/api/types";
+import { Session, SessionStatus, UserType } from "@/api/types";
 import { updateSessionStatus, createReview } from "@/store/sessionsSlice";
 import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
@@ -56,7 +56,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
   const { user } = useSelector((state: RootState) => state.auth);
 
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [actionType, setActionType] = useState<"accept" | "decline" | null>(
+  const [actionType, setActionType] = useState<"accept" | "decline" | "complete" | null>(
     null,
   );
   const [reviewDialogOpen, setReviewDialogOpen] = useState(false);
@@ -75,7 +75,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
     },
   });
 
-  const handleOpenConfirmDialog = (type: "accept" | "decline") => {
+  const handleOpenConfirmDialog = (type: "accept" | "decline" | "complete") => {
     setActionType(type);
     setConfirmDialogOpen(true);
   };
@@ -88,8 +88,21 @@ const SessionCard: React.FC<SessionCardProps> = ({
   const handleUpdateStatus = async () => {
     if (!actionType) return;
 
-    const status =
-      actionType === "accept" ? SessionStatus.ACCEPTED : SessionStatus.DECLINED;
+    let status: SessionStatus;
+
+    switch (actionType) {
+      case "accept":
+        status = SessionStatus.ACCEPTED;
+        break;
+      case "decline":
+        status = SessionStatus.DECLINED;
+        break;
+      case "complete":
+        status = SessionStatus.COMPLETED;
+        break;
+      default:
+        return;
+    }
 
     try {
       await dispatch(
@@ -100,7 +113,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
       ).unwrap();
       handleCloseConfirmDialog();
     } catch (error) {
-      console.error("Failed to update session status", error);
+      console.error(`Failed to update session status to ${status}`, error);
     }
   };
 
@@ -119,7 +132,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
         createReview({
           sessionId: session.id,
           rating: data.rating,
-          comment: data.comment,
+          content: data.comment,
         }),
       ).unwrap();
       handleCloseReviewDialog();
@@ -137,7 +150,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
         };
       case SessionStatus.ACCEPTED:
         return {
-          label: "Accepted",
+          label: "Active",
           color: "success" as const,
         };
       case SessionStatus.DECLINED:
@@ -158,8 +171,9 @@ const SessionCard: React.FC<SessionCardProps> = ({
     }
   };
 
-  const isMentor = user?.role === UserRole.MENTOR;
+  const isMentor = user?.userType === UserType.MENTOR;
   const canTakeAction = isMentor && session.status === SessionStatus.PENDING;
+  const canComplete = isMentor && session.status === SessionStatus.ACCEPTED;
   const canReview = !isMentor && session.status === SessionStatus.COMPLETED;
 
   return (
@@ -174,7 +188,7 @@ const SessionCard: React.FC<SessionCardProps> = ({
           } }
         >
           <Typography variant="h6" component="div">
-            { session.title }
+            { session.topic }
           </Typography>
           <Chip
             label={ getStatusChipProps().label }
@@ -184,21 +198,8 @@ const SessionCard: React.FC<SessionCardProps> = ({
         </Box>
 
         <Typography variant="body2" color="text.secondary" paragraph>
-          { session.description }
+          { session.questions }
         </Typography>
-
-        { session.scheduledDate && (
-          <Box sx={ { display: "flex", alignItems: "center", mb: 2 } }>
-            <CalendarIcon
-              fontSize="small"
-              sx={ { mr: 1, color: "text.secondary" } }
-            />
-            <Typography variant="body2" color="text.secondary">
-              Scheduled for:{ " " }
-              { new Date(session.scheduledDate).toLocaleDateString() }
-            </Typography>
-          </Box>
-        ) }
 
         <Box
           sx={ {
@@ -211,9 +212,6 @@ const SessionCard: React.FC<SessionCardProps> = ({
             { isMentor
               ? `Requested by: ${userName || "User"}`
               : `Mentor: ${mentorName || "Mentor"}` }
-          </Typography>
-          <Typography variant="caption" color="text.secondary">
-            Created: { new Date(session.createdAt).toLocaleDateString() }
           </Typography>
         </Box>
 
@@ -241,6 +239,22 @@ const SessionCard: React.FC<SessionCardProps> = ({
           </>
         ) }
 
+        { canComplete && (
+          <>
+            <Divider sx={ { my: 2 } } />
+            <Box sx={ { display: "flex", justifyContent: "flex-end", gap: 1 } }>
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={ <DoneIcon /> }
+                onClick={ () => handleOpenConfirmDialog("complete") }
+              >
+                Mark as Completed
+              </Button>
+            </Box>
+          </>
+        ) }
+
         { canReview && (
           <>
             <Divider sx={ { my: 2 } } />
@@ -263,20 +277,24 @@ const SessionCard: React.FC<SessionCardProps> = ({
         <DialogTitle>
           { actionType === "accept"
             ? "Accept Mentorship Session?"
-            : "Decline Mentorship Session?" }
+            : actionType === "decline"
+              ? "Decline Mentorship Session?"
+              : "Complete Mentorship Session?" }
         </DialogTitle>
         <DialogContent>
           <DialogContentText>
             { actionType === "accept"
               ? "By accepting this session, you agree to provide mentorship to this mentee. Are you sure you want to proceed?"
-              : "Are you sure you want to decline this mentorship session? This action cannot be undone." }
+              : actionType === "decline"
+                ? "Are you sure you want to decline this mentorship session? This action cannot be undone."
+                : "Are you sure you want to mark this session as completed? This will allow the mentee to leave a review and will move the session to your history." }
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={ handleCloseConfirmDialog }>Cancel</Button>
           <Button
             onClick={ handleUpdateStatus }
-            color={ actionType === "accept" ? "success" : "error" }
+            color={ actionType === "decline" ? "error" : "primary" }
             variant="contained"
             disabled={ isLoading }
           >
@@ -284,8 +302,10 @@ const SessionCard: React.FC<SessionCardProps> = ({
               <CircularProgress size={ 24 } />
             ) : actionType === "accept" ? (
               "Accept"
-            ) : (
+            ) : actionType === "decline" ? (
               "Decline"
+            ) : (
+              "Complete Session"
             ) }
           </Button>
         </DialogActions>
