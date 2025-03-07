@@ -7,6 +7,7 @@ from .models import Review
 from users.utils import get_authenticated_user
 from mentorship.models import MentorshipSession
 from bson import ObjectId
+import traceback
 User = get_user_model()
 
 class ReviewType(MongoengineObjectType):
@@ -30,25 +31,25 @@ class Query(graphene.ObjectType):
         return Review.objects.all()  # Admin can see all reviews
     
     def resolve_mentor_reviews(self, info, mentor_id):
-        user = get_authenticated_user(info.context)  # Ensure authentication
-
+    # Skip the authentication check for simplicity
+    # user = get_authenticated_user(info.context)
+    
         try:
-        # Convert to string if needed
-            mentor_id_str = str(mentor_id)
+        # Convert string ID to ObjectId
+            mentor_obj_id = ObjectId(mentor_id)
         
-        # Assuming your User model has a field like 'mongo_id' that stores the MongoDB ObjectId as string
-        # If not, you need to add such a field to link Django users with MongoDB documents
-            mentor = User.objects.get(mongo_id=mentor_id_str, user_type='mentor')
-        
-        # Find sessions for this mentor
-            sessions = MentorshipSession.objects.filter(mentor=mentor)
+        # Find sessions directly by mentor ObjectId without loading the User model
+        # This uses the internal MongoDB reference that mongoengine creates
+            sessions = MentorshipSession.objects.filter(mentor=mentor_obj_id)
         
         # Get reviews for these sessions
-            return Review.objects.filter(session__in=sessions, is_visible=True)
-            
-        except User.DoesNotExist:
-            raise GraphQLError('Mentor not found')
+            reviews = Review.objects.filter(session__in=sessions, is_visible=True)
+            return reviews
+        
         except Exception as e:
+        # Print more detailed error information
+            
+            print(f"Error details: {traceback.format_exc()}")
             raise GraphQLError(f'Error retrieving reviews: {str(e)}')
 class CreateReview(graphene.Mutation):
     review = graphene.Field(ReviewType)
