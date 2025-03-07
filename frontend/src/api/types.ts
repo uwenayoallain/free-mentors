@@ -6,7 +6,7 @@ export enum UserType {
 
 export enum SessionStatus {
   PENDING = "pending",
-  ACCEPTED = "accepted",
+  ACCEPTED = "approved",
   DECLINED = "declined",
   COMPLETED = "completed",
 }

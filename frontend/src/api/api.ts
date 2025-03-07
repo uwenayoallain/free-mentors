@@ -636,7 +636,7 @@ export const api = {
   // Review endpoints
   getReviews: async (mentorId: string): Promise<ApiResponse<Review[]>> => {
     const query = gql`
-      query MentorReviews($mentorId: ID!) {
+      query MentorReviews($mentorId: String!) {
         mentorReviews(mentorId: $mentorId) {
           id
           session {
@@ -645,6 +645,7 @@ export const api = {
           rating
           content
           isVisible
+          createdAt
         }
       }
     `;

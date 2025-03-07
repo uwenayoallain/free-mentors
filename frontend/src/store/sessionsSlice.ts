@@ -9,6 +9,7 @@ import {
   SessionStatus,
 } from "@/api/types";
 import { RootState } from "@/store";
+import { logout } from "./authSlice";
 
 interface SessionsState {
   sessions: Session[];
@@ -144,10 +145,8 @@ const sessionsSlice = createSlice({
         state.sessions[index] = action.payload;
       }
 
-      const statusText =
-        action.payload.status === SessionStatus.ACCEPTED
-          ? "accepted"
-          : "declined";
+      const statusText = action.payload.status;
+
       state.successMessage = `Session ${statusText} successfully!`;
     });
     builder.addCase(updateSessionStatus.rejected, (state, action) => {
@@ -170,6 +169,12 @@ const sessionsSlice = createSlice({
     builder.addCase(createReview.rejected, (state, action) => {
       state.isLoading = false;
       state.error = action.payload || { message: "Failed to submit review" };
+    });
+    builder.addCase(logout.fulfilled, (state) => {
+      state.sessions = [];
+      state.successMessage = null;
+      state.isLoading = false;
+      state.error = null;
     });
   },
 });

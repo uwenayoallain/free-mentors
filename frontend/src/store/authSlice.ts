@@ -145,6 +145,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       state.user = null;
       state.token = null;
+      state.error = null;
       localStorage.removeItem("token");
     });
 

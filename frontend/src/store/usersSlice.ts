@@ -2,6 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { api } from "@/api/api";
 import { ApiError, Mentor, Review, User } from "@/api/types";
 import { RootState } from "@/store";
+import { logout } from "./authSlice";
 
 interface UsersState {
   currentMentor: Mentor | null;
@@ -215,6 +216,15 @@ const usersSlice = createSlice({
       state.reviews = state.reviews.filter(
         (review) => review.id !== action.payload.id
       );
+    });
+
+    builder.addCase(logout.fulfilled, (state) => {
+      state.currentMentor = null;
+      state.reviews = [];
+      state.allMentors = [];
+      state.allUsers = [];
+      state.error = null;
+      state.isLoading = false;
     });
   },
 });

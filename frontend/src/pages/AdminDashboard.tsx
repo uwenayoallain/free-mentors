@@ -182,7 +182,7 @@ const AdminDashboard: React.FC = () => {
                     <InputAdornment position="start">
                       <SearchIcon />
                     </InputAdornment>
-                  ),
+                  )
                 } }
               />
             </Stack>
